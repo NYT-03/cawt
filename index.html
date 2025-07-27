@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CAWT ESCAPE ROOM</title>
   <style>
     body {
@@ -13,19 +13,36 @@
       margin: 0;
       padding: 0;
     }
-    #game, #map, #timer, #wrongDisplay {
+    #game, #map, #timer, #wrongDisplay, #clueBtn, #clueCounter, #roomInfo, #lockIcon, #story {
       position: absolute;
       padding: 10px;
       z-index: 2;
     }
     #game {
-      top: 10%;
+      top: 25%;
       left: 10%;
       right: 10%;
+      text-align: center;
+    }
+    #story {
+      top: 20%;
+      left: 10%;
+      right: 10%;
+      font-size: 1.4em;
+      color: #f33;
+      text-shadow: 0 0 10px red;
+      animation: glitch 2s infinite;
+      max-width: 80%;
+      margin: auto;
+      user-select: none;
     }
     #timer {
       top: 0;
       right: 0;
+    }
+    #clueCounter {
+      top: 0;
+      left: 0;
     }
     #wrongDisplay {
       top: 40%;
@@ -33,7 +50,30 @@
       font-size: 5em;
       color: red;
       display: none;
-      text-shadow: 0 0 5px red;
+      text-shadow: 0 0 10px red;
+      font-weight: bold;
+      animation: glitch 1s infinite;
+      user-select: none;
+    }
+    #roomInfo {
+      top: 55%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #f00;
+      font-size: 1.3em;
+      max-width: 80%;
+      text-align: center;
+      filter: drop-shadow(0 0 3px red);
+      animation: glitch 2s infinite;
+    }
+    #lockIcon {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 5em;
+      display: none;
+      text-shadow: 0 0 20px red;
+      user-select: none;
     }
     #inputArea {
       position: absolute;
@@ -42,6 +82,7 @@
       right: 10%;
       display: flex;
       gap: 10px;
+      align-items: center;
     }
     input[type="text"] {
       flex: 1;
@@ -50,6 +91,16 @@
       background: #222;
       color: white;
       border: 1px solid #444;
+      transition: box-shadow 0.3s ease-in-out;
+    }
+    input[type="text"]:focus {
+      outline: none;
+      background: #222;
+      color: white;
+    }
+    .input-error {
+      box-shadow: 0 0 8px 3px red;
+      animation: glitch 0.3s infinite;
     }
     button {
       padding: 10px 20px;
@@ -58,6 +109,20 @@
       border: none;
       font-weight: bold;
       cursor: pointer;
+      user-select: none;
+    }
+    button.choice {
+      background: #222;
+      border: 2px solid #c00;
+      font-weight: normal;
+      font-size: 1.2em;
+      flex: none;
+      padding: 10px 15px;
+      transition: background 0.3s, color 0.3s;
+    }
+    button.choice:hover {
+      background: #c00;
+      color: white;
     }
     .glitch {
       animation: glitch 1s infinite;
@@ -70,152 +135,258 @@
       80% { text-shadow: 2px -2px red, -2px 2px blue; }
       100% { text-shadow: -2px 0 red, 2px 0 blue; }
     }
-    .jump-scare {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: url('https://i.imgur.com/OuLE1gK.png') center center / cover no-repeat;
-      z-index: 999;
-      display: none;
+    h2 {
+      font-size: 2.5em;
+      color: #f00;
+      text-shadow: 0 0 10px red, 0 0 20px red;
+      margin-bottom: 0.3em;
+    }
+    p {
+      font-size: 1.5em;
+      color: #ddd;
+      text-shadow: 1px 1px 5px #f00, -1px -1px 5px #000;
+      filter: contrast(1.2) brightness(1.1);
+      animation: glitch 2s infinite;
+      margin-top: 0.3em;
     }
   </style>
 </head>
 <body>
-  <div id="game" class="glitch"></div>
-  <div id="map"></div>
   <div id="timer"></div>
+  <div id="clueCounter">🔍 Clues: <span id="clueCount">0</span></div>
+  <div id="story" style="display:none;"></div>
+  <div id="game" class="glitch"></div>
+  <div id="roomInfo"></div>
   <div id="wrongDisplay">WRONG</div>
+  <div id="lockIcon">🔓</div>
   <div id="inputArea">
-    <input type="text" id="answerInput" placeholder="Type your answer...">
+    <input type="text" id="answerInput" placeholder="Type your answer..." autocomplete="off" />
     <button onclick="submitAnswer()">Submit</button>
+    <button id="clueBtn" onclick="getClue()">Get Clue</button>
   </div>
-  <audio id="bgAudio" src="bg.mp3" loop autoplay></audio>
-  <audio id="scareAudio" src="scream.mp3"></audio>
-  <div class="jump-scare" id="jump"></div>
 
-  <script>
-    const game = document.getElementById('game');
-    const audio = document.getElementById('bgAudio');
-    const scareAudio = document.getElementById('scareAudio');
-    const map = document.getElementById('map');
-    const timer = document.getElementById('timer');
-    const wrongDisplay = document.getElementById('wrongDisplay');
-    const jump = document.getElementById('jump');
-    const answerInput = document.getElementById('answerInput');
+<script>
+  const game = document.getElementById('game');
+  const timer = document.getElementById('timer');
+  const wrongDisplay = document.getElementById('wrongDisplay');
+  const answerInput = document.getElementById('answerInput');
+  const clueCountDisplay = document.getElementById('clueCount');
+  const lockIcon = document.getElementById('lockIcon');
+  const roomInfo = document.getElementById('roomInfo');
+  const inputArea = document.getElementById('inputArea');
+  const clueBtn = document.getElementById('clueBtn');
+  const storyDiv = document.getElementById('story');
 
-    let startTime = Date.now();
-    setInterval(() => {
-      if (timer) {
-        let elapsed = Math.floor((Date.now() - startTime) / 1000);
-        let minutes = Math.floor(elapsed / 60);
-        let seconds = elapsed % 60;
-        timer.textContent = `⏱️ Time: ${minutes}m ${seconds}s`;
-      }
+  let currentRoom = 0;
+  const totalRooms = 50;
+  const startTime = Date.now();
+  let clues = 0;
+  let wrongTries = 0;
+  let clueButtonClicksWithoutClues = 0;
+  let storyTimeout = null;
+
+  // Riddles with related stories
+  const riddles = [
+    {
+      question: "What has keys but can't open locks?",
+      answer: "keyboard",
+      clue: "Used in every room, lies in front of you.",
+      story: "You find yourself in a dimly lit chamber. The walls hum softly, and a faint glow from a strange device catches your eye. It has many keys but none to open a door..."
+    },
+    {
+      question: "What has hands but can't clap?",
+      answer: "clock",
+      clue: "Time ticks in silence above.",
+      story: "A chilling silence fills the air as you see a clock hanging crookedly on the wall, its hands frozen yet impossibly moving in your mind..."
+    },
+    {
+      question: "What gets wetter the more it dries?",
+      answer: "towel",
+      clue: "It helps after showers.",
+      story: "You enter a damp room, the scent of fresh water lingering. A soft fabric hangs nearby, promising to dry what it touches, yet it itself becomes soaked."
+    },
+    {
+      question: "What can fill a room but takes up no space?",
+      answer: "light",
+      clue: "It shines but weighs nothing.",
+      story: "Darkness surrounds you, but a sudden flicker of brightness fills the chamber, making shadows retreat and revealing the path ahead."
+    },
+    {
+      question: "What has a neck but no head?",
+      answer: "bottle",
+      clue: "Found in kitchens, holds liquid.",
+      story: "You see an ancient bottle resting on a dusty shelf, its slender neck stretched towards an unseen ceiling."
+    },
+    {
+      question: "Which number comes next: 2, 4, 6, ?",
+      answer: "8",
+      clue: "It's the next even number.",
+      story: "A sequence of numbers glows on the floor: 2, 4, 6... The pattern beckons you to find what follows."
+    },
+    {
+      question: "What color do you get when you mix red and white?",
+      answer: "pink",
+      clue: "It's a lighter shade of red.",
+      story: "A palette of colors swirls before you, merging shades to create something soft and delicate."
+    }
+  ];
+
+  setInterval(() => {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const minutes = Math.floor(elapsed / 60);
+    const seconds = elapsed % 60;
+    timer.textContent = `⏱️ Time: ${minutes}m ${seconds}s`;
+  }, 1000);
+
+  function showWrongEffect() {
+    wrongDisplay.style.display = 'block';
+    document.body.style.backgroundColor = '#300';
+    setTimeout(() => {
+      wrongDisplay.style.display = 'none';
+      document.body.style.backgroundColor = '#111';
+    }, 1500);
+  }
+
+  function showInputError() {
+    answerInput.classList.add('input-error');
+    setTimeout(() => answerInput.classList.remove('input-error'), 3000);
+  }
+
+  function showLock() {
+    lockIcon.style.display = 'block';
+    setTimeout(() => {
+      lockIcon.style.display = 'none';
+    }, 1500);
+  }
+
+  function showJumpScare() {
+    const jump = document.createElement('div');
+    jump.style.position = 'fixed';
+    jump.style.top = '0';
+    jump.style.left = '0';
+    jump.style.right = '0';
+    jump.style.bottom = '0';
+    jump.style.background = 'url(https://i.imgur.com/OuLE1gK.png) center center / cover no-repeat';
+    jump.style.zIndex = '9999';
+    jump.style.animation = 'glitch 0.5s infinite';
+    document.body.appendChild(jump);
+    setTimeout(() => {
+      document.body.removeChild(jump);
     }, 1000);
+  }
 
-    const puzzleData = [
-      { puzzle: "What has keys but can't open locks?", answer: "keyboard" },
-      { puzzle: "What has hands but can’t clap?", answer: "clock" },
-      { puzzle: "The more you take, the more you leave behind. What am I?", answer: "footsteps" },
-      { puzzle: "What can travel around the world while staying in one spot?", answer: "stamp" },
-      { puzzle: "What gets wetter the more it dries?", answer: "towel" },
-      { puzzle: "I speak without a mouth and hear without ears. What am I?", answer: "echo" },
-      { puzzle: "What has a heart that doesn’t beat?", answer: "artichoke" },
-      { puzzle: "What goes up but never comes down?", answer: "age" },
-      { puzzle: "I’m tall when I’m young and short when I’m old. What am I?", answer: "candle" },
-      { puzzle: "What runs, but never walks, has a bed but never sleeps?", answer: "river" },
-      { puzzle: "I have branches, but no fruit, trunk or leaves. What am I?", answer: "bank" },
-      { puzzle: "What begins with T, ends with T, and has T in it?", answer: "teapot" },
-      { puzzle: "The more you take, the bigger I get. What am I?", answer: "hole" },
-      { puzzle: "What comes once in a minute, twice in a moment, but never in a thousand years?", answer: "m" },
-      { puzzle: "What has an eye but can’t see?", answer: "needle" },
-      { puzzle: "What invention lets you look right through a wall?", answer: "window" },
-      { puzzle: "What has one head, one foot, and four legs?", answer: "bed" },
-      { puzzle: "If you drop me, I’m sure to crack, but give me a smile and I’ll always smile back. What am I?", answer: "mirror" },
-      { puzzle: "What word is spelled incorrectly in every dictionary?", answer: "incorrectly" },
-      { puzzle: "What can fill a room but takes up no space?", answer: "light" }
-    ];
+  function showStoryThenRiddle() {
+    // Disable input and clue button during story
+    inputArea.style.display = 'none';
+    clueBtn.disabled = true;
+    game.style.display = 'none';
+    roomInfo.style.display = 'none';
 
-    const sayings = [
-      "Shower thought: If you clean a vacuum cleaner, you become the vacuum cleaner.",
-      "Joke: Why don't skeletons fight each other? They don't have the guts!",
-      "Wise saying: A smooth sea never made a skilled sailor.",
-      "Joke: Why do bees have sticky hair? Because they use honeycombs!",
-      "Shower thought: Nothing is ever really on fire — fire is on things."
-    ];
+    const riddle = riddles[currentRoom % riddles.length];
+    storyDiv.style.display = 'block';
+    storyDiv.textContent = riddle.story;
 
-    const rooms = Array.from({ length: 50 }, (_, i) => {
-      const puzzleIndex = i % puzzleData.length;
-      const sayingIndex = i % sayings.length;
-      const roomPuzzle = puzzleData[puzzleIndex];
+    if (storyTimeout) clearTimeout(storyTimeout);
+    storyTimeout = setTimeout(() => {
+      storyDiv.style.display = 'none';
+      game.style.display = 'block';
+      roomInfo.style.display = 'block';
+      clueBtn.disabled = false;
+      displayRiddle();
+    }, 10000);
+  }
 
-      return {
-        title: `Room ${i + 1}`,
-        desc: `You enter room ${i + 1}. Shadows crawl and time feels slower here.`,
-        story: `${sayings[sayingIndex]}<br><br>This place feels different... like something is always behind you.`,
-        puzzle: roomPuzzle.puzzle,
-        answer: roomPuzzle.answer
-      };
-    });
+  function displayRiddle() {
+    const riddle = riddles[currentRoom % riddles.length];
+    roomInfo.textContent = `🕳 You feel a chill... Room ${currentRoom + 1} awaits.`;
 
-    rooms[0].story = "Wise saying: Even the greatest was once a beginner. Don’t be afraid to take that first step.<br><br>You awaken chained in a digital dungeon. The walls drip with static. A screen flickers: 'The answer opens the path. Think of what can't open locks but holds many keys.'";
-    rooms[0].puzzle = "What has keys but can't open locks?";
-    rooms[0].answer = "keyboard";
+    let html = `<h2>Room ${currentRoom + 1}</h2><p>${riddle.question}</p>`;
 
-    let currentRoom = 0;
+    if (riddle.choices && riddle.choices.length) {
+      // multiple choice room
+      inputArea.style.display = 'none';
+      game.innerHTML = html + '<div id="choicesContainer" style="margin-top:20px;"></div>';
 
-    function delay(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+      const choicesContainer = document.getElementById('choicesContainer');
+      choicesContainer.innerHTML = '';
+      riddle.choices.forEach(choice => {
+        const btn = document.createElement('button');
+        btn.textContent = choice;
+        btn.className = 'choice';
+        btn.onclick = () => checkAnswer(choice);
+        choicesContainer.appendChild(btn);
+      });
+    } else {
+      inputArea.style.display = 'flex';
+      game.innerHTML = html;
+    }
+    answerInput.value = '';
+    answerInput.focus();
+  }
+
+  function displayRoom() {
+    if (currentRoom >= totalRooms) {
+      game.innerHTML = `<h1>🎉 You escaped all ${totalRooms} rooms!</h1><p>${timer.textContent}</p>`;
+      inputArea.style.display = 'none';
+      roomInfo.textContent = '';
+      storyDiv.style.display = 'none';
+      return;
+    }
+    showStoryThenRiddle();
+  }
+
+  function checkAnswer(input) {
+    const answer = input.trim().toLowerCase();
+    const correct = riddles[currentRoom % riddles.length].answer.toLowerCase();
+
+    if (!answer) {
+      showInputError();
+      return;
     }
 
-    function showWrongEffect() {
-      if (wrongDisplay) {
-        wrongDisplay.style.display = 'block';
-        document.body.style.backgroundColor = '#300';
-        setTimeout(() => {
-          wrongDisplay.style.display = 'none';
-          document.body.style.backgroundColor = '#111';
-        }, 1500);
+    if (answer === correct) {
+      wrongTries = 0;
+      currentRoom++;
+      if (currentRoom % 2 === 0) clues++;
+      clueCountDisplay.textContent = clues;
+      showLock();
+      displayRoom();
+    } else {
+      wrongTries++;
+      if (wrongTries >= 3) {
+        alert(`🤫 Hint: ${riddles[currentRoom % riddles.length].answer}`);
+      }
+      showWrongEffect();
+      if (Math.random() < 0.3) {
+        showJumpScare();
       }
     }
+  }
 
-    function showJumpScare() {
-      if (jump && scareAudio) {
-        jump.style.display = 'block';
-        scareAudio.play();
-        setTimeout(() => {
-          jump.style.display = 'none';
-        }, 1000);
-      }
-    }
+  function submitAnswer() {
+    checkAnswer(answerInput.value);
+  }
 
-    function displayRoom() {
-      if (currentRoom >= rooms.length) {
-        game.innerHTML = `<h1>You escaped! 🎉</h1><p>Total Time: ${timer.textContent}</p>`;
-        document.getElementById('inputArea').style.display = 'none';
-        return;
-      }
-      const room = rooms[currentRoom];
-      game.innerHTML = `<h2>${room.title}</h2><p>${room.desc}</p><p>${room.story}</p><h3>Puzzle:</h3><p>${room.puzzle}</p>`;
-    }
-
-    function checkAnswer(input) {
-      const room = rooms[currentRoom];
-      if (input.trim().toLowerCase() === room.answer) {
-        currentRoom++;
-        displayRoom();
+  function getClue() {
+    if (clues > 0) {
+      clues--;
+      clueCountDisplay.textContent = clues;
+      clueButtonClicksWithoutClues = 0;
+      alert(`🕯 Clue: ${riddles[currentRoom % riddles.length].clue}`);
+    } else {
+      clueButtonClicksWithoutClues++;
+      if (clueButtonClicksWithoutClues > 3) {
+        alert(`💡 Answer: ${riddles[currentRoom % riddles.length].answer}`);
+        clueButtonClicksWithoutClues = 0;
       } else {
-        showWrongEffect();
-        if (Math.random() < 0.3) showJumpScare();
+        alert("❌ You have no clues left! Press again 3 times to reveal answer.");
       }
     }
+  }
 
-    function submitAnswer() {
-      checkAnswer(answerInput.value);
-      answerInput.value = '';
-    }
+  // Start the first room's story
+  displayRoom();
 
-    // Start the game
-    displayRoom();
-  </script>
+</script>
 </body>
 </html>
