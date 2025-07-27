@@ -1,1 +1,208 @@
-html files
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAWT Escape Room</title>
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: 'Courier New', monospace;
+      padding: 20px;
+      transition: background 1s, color 1s;
+    }
+    .room {
+      display: none;
+      animation: fadeIn 1s ease-in-out;
+    }
+    .visible {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    button {
+      background: crimson;
+      color: white;
+      border: none;
+      padding: 10px;
+      margin: 10px 0;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    input[type="text"] {
+      background: #222;
+      color: white;
+      border: 1px solid #555;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+    #win {
+      font-size: 2em;
+      color: lime;
+      animation: glow 1s infinite alternate;
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 5px lime; }
+      to { text-shadow: 0 0 20px lime; }
+    }
+    #map {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 0.9em;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    #map span {
+      display: none;
+      transition: opacity 0.5s ease-in-out;
+    }
+    #map span.active {
+      display: block;
+      opacity: 1;
+    }
+    #map span.preview {
+      display: block;
+      opacity: 0.4;
+    }
+    #timer {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 0.9em;
+    }
+    .lock-animation {
+      width: 120px;
+      height: 120px;
+      margin: 20px auto;
+      background-image: url('https://cdn-icons-png.flaticon.com/512/3064/3064197.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      animation: slowUnlock 2.5s ease-in-out;
+    }
+    @keyframes slowUnlock {
+      0% { transform: rotate(-60deg) scale(0.8); opacity: 0; }
+      50% { transform: rotate(0deg) scale(1); opacity: 1; }
+      100% { transform: rotate(30deg) scale(1.1); }
+    }
+  </style>
+</head>
+<body>
+  <h1>🔒 CAWT'S 50-ROOM ESCAPE LABYRINTH 🔓</h1>
+  <div id="map"></div>
+  <div id="timer"></div>
+  <div id="game"></div>
+  <audio id="bgAudio" src="https://cdn.pixabay.com/audio/2023/05/17/audio_671b71be06.mp3" loop autoplay></audio>
+
+  <script>
+    const game = document.getElementById('game');
+    const audio = document.getElementById('bgAudio');
+    const map = document.getElementById('map');
+    const timer = document.getElementById('timer');
+
+    let startTime = Date.now();
+    setInterval(() => {
+      let elapsed = Math.floor((Date.now() - startTime) / 1000);
+      let minutes = Math.floor(elapsed / 60);
+      let seconds = elapsed % 60;
+      timer.textContent = `⏱️ Time: ${minutes}m ${seconds}s`;
+    }, 1000);
+
+    const sayings = [
+      "Shower thought: If you clean a vacuum cleaner, you become the vacuum cleaner.",
+      "Joke: Why don't skeletons fight each other? They don't have the guts!",
+      "Wise saying: A smooth sea never made a skilled sailor.",
+      "Joke: Why do bees have sticky hair? Because they use honeycombs!",
+      "Shower thought: Nothing is ever really on fire — fire is on things."
+    ];
+
+    const rooms = Array.from({ length: 50 }, (_, i) => {
+      return {
+        title: `Room ${i + 1}`,
+        desc: `You enter room ${i + 1}. Shadows crawl and time feels slower here.`,
+        story: `${sayings[i % sayings.length]}<br><br>Room ${i + 1} was once a testing ground. The walls whisper secrets of past challengers. Look and listen — clues may hide in humor, wisdom, or wonder.`,
+        puzzle: `What's your next move?`,
+        answer: "next"
+      };
+    });
+
+    rooms[0].story = "Wise saying: Even the greatest was once a beginner. Don’t be afraid to take that first step.<br><br>You awaken chained in a cold digital dungeon. Screens flicker and one reads: 'The answer opens the path. Think of what can't open locks but holds many keys.'";
+    rooms[0].puzzle = "What has keys but can't open locks?";
+    rooms[0].answer = "keyboard";
+
+    let currentRoom = 0;
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function renderRoom() {
+      const room = rooms[currentRoom];
+      updateMap();
+      game.innerHTML = `
+        <div class="room visible">
+          <div class="lock-animation"></div>
+          <h2>${room.title}</h2>
+          <p><em>${room.story}</em></p>
+        </div>
+      `;
+      await delay(Math.max(15000, room.story.length * 50));
+      game.innerHTML += `
+        <p>${room.desc}</p>
+        <p><strong>Riddle:</strong> ${room.puzzle}</p>
+        <input type="text" id="answerInput" placeholder="Your answer...">
+        <br>
+        <button onclick="submitAnswer()">Submit</button>
+      `;
+    }
+
+    function updateMap() {
+      let mapHTML = '🗺️ Progress:<br>';
+      for (let i = 0; i < rooms.length; i++) {
+        if (i === currentRoom) {
+          mapHTML += `<span class="active" style="color: yellow">Room ${i + 1}</span>`;
+        } else if (i === currentRoom + 1) {
+          mapHTML += `<span class="preview" style="color: #777">Room ${i + 1}</span>`;
+        }
+      }
+      map.innerHTML = mapHTML;
+    }
+
+    function submitAnswer() {
+      const input = document.getElementById('answerInput').value.trim().toLowerCase();
+      if (input === rooms[currentRoom].answer.toLowerCase()) {
+        currentRoom++;
+        if (currentRoom >= rooms.length) {
+          renderWin();
+        } else {
+          renderRoom();
+        }
+      } else {
+        alert("Wrong answer! Try again.");
+      }
+    }
+
+    function renderWin() {
+      game.innerHTML = `
+        <div class="room visible">
+          <div class="lock-animation"></div>
+          <h2 id="win">🎉 YOU ESCAPED ALL 50 ROOMS! 🎉</h2>
+          <p>Respect from CAWT-GPT: LEGENDARY. Your mind is unmatched!</p>
+        </div>
+      `;
+      audio.pause();
+      updateMap();
+    }
+
+    renderRoom();
+  </script>
+</body>
+</html>
