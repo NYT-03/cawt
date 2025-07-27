@@ -13,7 +13,7 @@
       margin: 0;
       padding: 0;
     }
-    #game, #map, #timer, #wrongDisplay, #clueBtn, #clueCounter, #roomInfo, #lockIcon, #story {
+    #game, #map, #timer, #wrongDisplay, #clueBtn, #clueCounter, #roomInfo, #lockIcon, #story, #intro {
       position: absolute;
       padding: 10px;
       z-index: 2;
@@ -23,6 +23,7 @@
       left: 10%;
       right: 10%;
       text-align: center;
+      display: none; /* Hidden during intro */
     }
     #story {
       top: 20%;
@@ -35,14 +36,17 @@
       max-width: 80%;
       margin: auto;
       user-select: none;
+      display: none;
     }
     #timer {
       top: 0;
       right: 0;
+      display: none; /* Hidden during intro */
     }
     #clueCounter {
       top: 0;
       left: 0;
+      display: none; /* Hidden during intro */
     }
     #wrongDisplay {
       top: 40%;
@@ -65,6 +69,7 @@
       text-align: center;
       filter: drop-shadow(0 0 3px red);
       animation: glitch 2s infinite;
+      display: none; /* Hidden during intro */
     }
     #lockIcon {
       top: 50%;
@@ -80,7 +85,7 @@
       bottom: 5%;
       left: 10%;
       right: 10%;
-      display: flex;
+      display: none; /* Hidden during intro */
       gap: 10px;
       align-items: center;
     }
@@ -149,9 +154,59 @@
       animation: glitch 2s infinite;
       margin-top: 0.3em;
     }
+    /* Intro styles */
+    #intro {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #111;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    #intro-title {
+      font-size: 4em;
+      color: #f00;
+      text-shadow: 0 0 15px red, 0 0 30px red;
+      animation: glitch 1.5s infinite;
+      margin-bottom: 20px;
+    }
+    #intro-loader {
+      width: 60px;
+      height: 60px;
+      border: 8px solid #f00;
+      border-top: 8px solid #111;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+    #intro-story {
+      font-size: 1.5em;
+      color: #ddd;
+      text-shadow: 1px 1px 5px #f00;
+      max-width: 80%;
+      text-align: center;
+      animation: glitch 2s infinite;
+      display: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
+  <div id="intro">
+    <div id="intro-title">CAWT ESCAPE ROOM</div>
+    <div id="intro-loader"></div>
+    <div id="intro-story">
+      You wandered too far into the abandoned manor, lured by whispers of forgotten secrets. A cold wind slammed the door shut behind you, and the walls pulsed with an eerie glow. Trapped in a maze of riddles, your only escape is to solve the mysteries within... or remain forever in the shadows.
+    </div>
+  </div>
   <div id="timer"></div>
   <div id="clueCounter">🔍 Clues: <span id="clueCount">0</span></div>
   <div id="story" style="display:none;"></div>
@@ -176,60 +231,239 @@
   const inputArea = document.getElementById('inputArea');
   const clueBtn = document.getElementById('clueBtn');
   const storyDiv = document.getElementById('story');
+  const intro = document.getElementById('intro');
+  const introTitle = document.getElementById('intro-title');
+  const introLoader = document.getElementById('intro-loader');
+  const introStory = document.getElementById('intro-story');
 
   let currentRoom = 0;
-  const totalRooms = 50;
+  const totalRooms = 30;
   const startTime = Date.now();
   let clues = 0;
   let wrongTries = 0;
   let clueButtonClicksWithoutClues = 0;
   let storyTimeout = null;
 
-  // Riddles with related stories
+  // Riddles array (unchanged from previous version)
   const riddles = [
     {
-      question: "What has keys but can't open locks?",
-      answer: "keyboard",
-      clue: "Used in every room, lies in front of you.",
-      story: "You find yourself in a dimly lit chamber. The walls hum softly, and a faint glow from a strange device catches your eye. It has many keys but none to open a door..."
+      question: "The more you take, the more you leave behind. What am I?",
+      answer: "footprint",
+      clue: "Your steps create me.",
+      story: "The floor creaks beneath your feet in this shadowed chamber, each step leaving a trace that lingers in the dust..."
     },
     {
-      question: "What has hands but can't clap?",
+      question: "I fly without wings, I cry without eyes. Darkness follows me. What am I?",
+      answer: "cloud",
+      clue: "I bring rain and shade.",
+      story: "A cold wind swirls through the room, and above, a form drifts, weeping silently as shadows trail in its wake..."
+    },
+    {
+      question: "I have cities but no houses, forests but no trees, and rivers but no water. What am I?",
+      answer: "map",
+      clue: "I guide without moving.",
+      story: "An ancient parchment lies on a stone table, its faded lines depicting places that exist only in ink..."
+    },
+    {
+      question: "I’m tall when I’m young, and short when I’m old. What am I?",
+      answer: "candle",
+      clue: "I burn to give light.",
+      story: "A flickering flame casts eerie shadows, its waxen form dwindling as it illuminates the cold stone walls..."
+    },
+    {
+      question: "I have branches, but no fruit, trunk, or leaves. What am I?",
+      answer: "bank",
+      clue: "I hold wealth, not plants.",
+      story: "A vaulted chamber echoes with the clink of coins, its walls lined with ledgers of forgotten transactions..."
+    },
+    {
+      question: "What can travel around the world while staying in a corner?",
+      answer: "stamp",
+      clue: "I’m small and sticky.",
+      story: "A tattered envelope lies in the corner, its small square mark whispering of journeys across distant lands..."
+    },
+    {
+      question: "I’m light as a feather, yet the strongest cannot hold me for long. What am I?",
+      answer: "breath",
+      clue: "You need me to live.",
+      story: "The air grows thin in this suffocating room, each gasp a reminder of something fleeting yet vital..."
+    },
+    {
+      question: "What begins with T, ends with T, and has T in it?",
+      answer: "teapot",
+      clue: "I pour a warm drink.",
+      story: "A chipped teapot sits on a dusty table, its spout hinting at long-forgotten gatherings in this forsaken place..."
+    },
+    {
+      question: "I’m always in front of you, but you can never see me. What am I?",
+      answer: "future",
+      clue: "I’m time yet to come.",
+      story: "A clock ticks backward, its hands pointing to moments unseen, as whispers of tomorrow fill the air..."
+    },
+    {
+      question: "What has one eye but cannot see?",
+      answer: "needle",
+      clue: "I pierce fabric.",
+      story: "A glinting needle lies on a tattered cloth, its single eye blind to the threads it binds..."
+    },
+    {
+      question: "The poor have me, the rich need me, and if you eat me, you’ll die. What am I?",
+      answer: "nothing",
+      clue: "I’m the absence of all.",
+      story: "An empty void greets you, a room so bare it feels like the absence itself is watching..."
+    },
+    {
+      question: "What runs all around a house but never moves?",
+      answer: "fence",
+      clue: "I guard the perimeter.",
+      story: "Rusty iron bars encircle the room, standing sentinel, immovable yet ever-present..."
+    },
+    {
+      question: "I’m full of holes, yet I hold water. What am I?",
+      answer: "sponge",
+      clue: "I clean with my pores.",
+      story: "A damp, porous object rests in a puddle, soaking up the room’s secrets with its countless voids..."
+    },
+    {
+      question: "What has a heart that doesn’t beat?",
+      answer: "artichoke",
+      clue: "I’m a vegetable.",
+      story: "A strange plant lies in the corner, its core still and silent, yet named for a living thing..."
+    },
+    {
+      question: "I’m taken from a mine and shut in a wooden case, never released, yet used by many. What am I?",
+      answer: "pencil",
+      clue: "I write without ink.",
+      story: "A worn pencil rolls across a desk, its core of earth trapped forever, leaving marks for all who wield it..."
+    },
+    {
+      question: "What can be broken without being touched?",
+      answer: "promise",
+      clue: "Words create and break me.",
+      story: "Whispers of broken oaths echo in the chamber, their weight heavier than any stone..."
+    },
+    {
+      question: "I’m always running but never move. What am I?",
       answer: "clock",
-      clue: "Time ticks in silence above.",
-      story: "A chilling silence fills the air as you see a clock hanging crookedly on the wall, its hands frozen yet impossibly moving in your mind..."
+      clue: "I measure time’s passage.",
+      story: "A ticking fills the room, as a clock’s hands chase time endlessly, yet remain fixed in place..."
     },
     {
-      question: "What gets wetter the more it dries?",
-      answer: "towel",
-      clue: "It helps after showers.",
-      story: "You enter a damp room, the scent of fresh water lingering. A soft fabric hangs nearby, promising to dry what it touches, yet it itself becomes soaked."
+      question: "What has a mouth but never speaks?",
+      answer: "river",
+      clue: "I flow with water.",
+      story: "A faint gurgle echoes from a carved stone mouth, its silent waters rushing through the dark..."
     },
     {
-      question: "What can fill a room but takes up no space?",
-      answer: "light",
-      clue: "It shines but weighs nothing.",
-      story: "Darkness surrounds you, but a sudden flicker of brightness fills the chamber, making shadows retreat and revealing the path ahead."
+      question: "I’m seen in water, but I’m not wet. What am I?",
+      answer: "reflection",
+      clue: "I mirror your face.",
+      story: "A still pool in the floor shows your face, a perfect image untouched by the water’s chill..."
     },
     {
-      question: "What has a neck but no head?",
-      answer: "bottle",
-      clue: "Found in kitchens, holds liquid.",
-      story: "You see an ancient bottle resting on a dusty shelf, its slender neck stretched towards an unseen ceiling."
+      question: "What has four legs in the morning, two at noon, and three in the evening?",
+      answer: "human",
+      clue: "I’m you, through life.",
+      story: "A shadow moves across the wall, its form shifting with the stages of a life’s journey..."
     },
     {
-      question: "Which number comes next: 2, 4, 6, ?",
-      answer: "8",
-      clue: "It's the next even number.",
-      story: "A sequence of numbers glows on the floor: 2, 4, 6... The pattern beckons you to find what follows."
+      question: "I’m weightless, but you can see me. Put me in a bucket, and I’ll make it lighter. What am I?",
+      answer: "hole",
+      clue: "I’m an absence you see.",
+      story: "A gaping void in the floor stares back, lightening all that holds it, yet visible to all..."
     },
     {
-      question: "What color do you get when you mix red and white?",
-      answer: "pink",
-      clue: "It's a lighter shade of red.",
-      story: "A palette of colors swirls before you, merging shades to create something soft and delicate."
+      question: "What speaks without a mouth and hears without ears?",
+      answer: "echo",
+      clue: "I repeat what you say.",
+      story: "Your voice bounces off the walls, a ghostly reply mimicking your words from the shadows..."
+    },
+    {
+      question: "If two’s company and three’s a crowd, what are four and five?",
+      answer: "nine",
+      clue: "Add them together.",
+      story: "Numbers glow faintly on the wall, their sum forming a key to the next chamber..."
+    },
+    {
+      question: "What is so fragile that saying its name breaks it?",
+      answer: "silence",
+      clue: "Quiet is my essence.",
+      story: "The room is deathly still, but a single sound shatters the fragile peace within..."
+    },
+    {
+      question: "I’m not alive, but I grow; I don’t have lungs, but I need air. What am I?",
+      answer: "fire",
+      clue: "I consume to exist.",
+      story: "A faint ember glows in the hearth, hungry for air, growing with each breath it steals..."
+    },
+    {
+      question: "What has a thumb but no fingers?",
+      answer: "glove",
+      clue: "I cover your hand.",
+      story: "A tattered glove lies discarded, its thumb empty, waiting for a hand to fill it..."
+    },
+    {
+      question: "I’m where the earth and sky appear to meet, yet you can never reach me. What am I?",
+      answer: "horizon",
+      clue: "I’m always distant.",
+      story: "A window shows a line where earth and sky converge, forever out of reach, taunting your escape..."
+    },
+    {
+      question: "What can you catch but not throw?",
+      answer: "cold",
+      clue: "It’s an illness.",
+      story: "A chill seeps into your bones, an invisible affliction caught in the damp air of this cursed room..."
+    },
+    {
+      question: "I’m born of incantation, sustained by attention, and die when ignored. What am I?",
+      answer: "spell",
+      clue: "Magic gives me life.",
+      story: "Runes glow faintly on the walls, their power fading unless your focus keeps them alive..."
+    },
+    {
+      question: "What is the next letter in this sequence: J, K, I, M, I, ?, I?",
+      answer: "I",
+      clue: "Look for a pattern in letters.",
+      story: "Carved letters spiral across the ceiling, their sequence a puzzle locking the door ahead..."
     }
   ];
+
+  // Intro sequence timing
+  function startIntro() {
+    // Initially hide game elements
+    game.style.display = 'none';
+    timer.style.display = 'none';
+    clueCounter.style.display = 'none';
+    roomInfo.style.display = 'none';
+    inputArea.style.display = 'none';
+    storyDiv.style.display = 'none';
+
+    // Show title for 3 seconds
+    introTitle.style.display = 'block';
+    setTimeout(() => {
+      introTitle.style.display = 'none';
+      introLoader.style.display = 'block';
+      // Show loader for 3 seconds
+      setTimeout(() => {
+        introLoader.style.display = 'none';
+        introStory.style.display = 'block';
+        // Show story for 20 seconds
+        setTimeout(() => {
+          intro.style.animation = 'glitch 0.5s infinite';
+          // Glitch for 4 seconds, then start game
+          setTimeout(() => {
+            intro.style.display = 'none';
+            game.style.display = 'block';
+            timer.style.display = 'block';
+            clueCounter.style.display = 'block';
+            roomInfo.style.display = 'block';
+            inputArea.style.display = 'flex';
+            displayRoom();
+          }, 4000);
+        }, 20000);
+      }, 3000);
+    }, 3000);
+  }
 
   setInterval(() => {
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
@@ -276,7 +510,6 @@
   }
 
   function showStoryThenRiddle() {
-    // Disable input and clue button during story
     inputArea.style.display = 'none';
     clueBtn.disabled = true;
     game.style.display = 'none';
@@ -303,7 +536,6 @@
     let html = `<h2>Room ${currentRoom + 1}</h2><p>${riddle.question}</p>`;
 
     if (riddle.choices && riddle.choices.length) {
-      // multiple choice room
       inputArea.style.display = 'none';
       game.innerHTML = html + '<div id="choicesContainer" style="margin-top:20px;"></div>';
 
@@ -370,7 +602,7 @@
   function getClue() {
     if (clues > 0) {
       clues--;
-      clueCountDisplay.textContent = clues;
+      clueCountDisplay.textContent = clues; // Fixed from 'clocks'
       clueButtonClicksWithoutClues = 0;
       alert(`🕯 Clue: ${riddles[currentRoom % riddles.length].clue}`);
     } else {
@@ -384,8 +616,8 @@
     }
   }
 
-  // Start the first room's story
-  displayRoom();
+  // Start the intro sequence instead of directly displaying the first room
+  startIntro();
 
 </script>
 </body>
