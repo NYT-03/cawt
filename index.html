@@ -3,119 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CAWT Escape Room</title>
+  <title>CAWT ESCAPE ROOM</title>
   <style>
     body {
-      background-color: #111;
+      background: #111;
       color: white;
-      font-family: 'Courier New', monospace;
-      padding: 20px;
-      transition: background 1s, color 1s;
+      font-family: 'Courier New', Courier, monospace;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
     }
-    .room {
-      display: none;
-      animation: fadeIn 1s ease-in-out;
-    }
-    .visible {
-      display: block;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    button {
-      background: crimson;
-      color: white;
-      border: none;
+    #game, #map, #timer, #wrongDisplay {
+      position: absolute;
       padding: 10px;
-      margin: 10px 0;
-      cursor: pointer;
-      border-radius: 5px;
+      z-index: 2;
     }
-    input[type="text"] {
-      background: #222;
-      color: white;
-      border: 1px solid #555;
-      padding: 5px;
-      margin-bottom: 10px;
-    }
-    #win {
-      font-size: 2em;
-      color: lime;
-      animation: glow 1s infinite alternate;
-    }
-    @keyframes glow {
-      from { text-shadow: 0 0 5px lime; }
-      to { text-shadow: 0 0 20px lime; }
-    }
-    #map {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 10px;
-      border-radius: 5px;
-      font-size: 0.9em;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    #map span {
-      display: none;
-      transition: opacity 0.5s ease-in-out;
-    }
-    #map span.active {
-      display: block;
-      opacity: 1;
-    }
-    #map span.preview {
-      display: block;
-      opacity: 0.4;
+    #game {
+      top: 10%;
+      left: 10%;
+      right: 10%;
     }
     #timer {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      background: rgba(255, 255, 255, 0.1);
+      top: 0;
+      right: 0;
+    }
+    #wrongDisplay {
+      top: 40%;
+      left: 30%;
+      font-size: 5em;
+      color: red;
+      display: none;
+      text-shadow: 0 0 5px red;
+    }
+    #inputArea {
+      position: absolute;
+      bottom: 5%;
+      left: 10%;
+      right: 10%;
+      display: flex;
+      gap: 10px;
+    }
+    input[type="text"] {
+      flex: 1;
       padding: 10px;
-      border-radius: 5px;
-      font-size: 0.9em;
+      font-size: 1em;
+      background: #222;
+      color: white;
+      border: 1px solid #444;
     }
-    .lock-animation {
-      width: 120px;
-      height: 120px;
-      margin: 20px auto;
-      background-image: url('https://cdn-icons-png.flaticon.com/512/3064/3064197.png');
-      background-size: contain;
-      background-repeat: no-repeat;
-      animation: slowUnlock 2.5s ease-in-out;
+    button {
+      padding: 10px 20px;
+      background: #c00;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
     }
-    @keyframes slowUnlock {
-      0% { transform: rotate(-60deg) scale(0.8); opacity: 0; }
-      50% { transform: rotate(0deg) scale(1); opacity: 1; }
-      100% { transform: rotate(30deg) scale(1.1); }
+    .glitch {
+      animation: glitch 1s infinite;
+    }
+    @keyframes glitch {
+      0% { text-shadow: 2px 0 red, -2px 0 blue; }
+      20% { text-shadow: -2px 0 red, 2px 0 blue; }
+      40% { text-shadow: 2px 2px red, -2px -2px blue; }
+      60% { text-shadow: -2px 2px red, 2px -2px blue; }
+      80% { text-shadow: 2px -2px red, -2px 2px blue; }
+      100% { text-shadow: -2px 0 red, 2px 0 blue; }
+    }
+    .jump-scare {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url('https://i.imgur.com/OuLE1gK.png') center center / cover no-repeat;
+      z-index: 999;
+      display: none;
     }
   </style>
 </head>
 <body>
-  <h1>🔒 CAWT'S 50-ROOM ESCAPE LABYRINTH 🔓</h1>
+  <div id="game" class="glitch"></div>
   <div id="map"></div>
   <div id="timer"></div>
-  <div id="game"></div>
-  <audio id="bgAudio" src="https://cdn.pixabay.com/audio/2023/05/17/audio_671b71be06.mp3" loop autoplay></audio>
+  <div id="wrongDisplay">WRONG</div>
+  <div id="inputArea">
+    <input type="text" id="answerInput" placeholder="Type your answer...">
+    <button onclick="submitAnswer()">Submit</button>
+  </div>
+  <audio id="bgAudio" src="bg.mp3" loop autoplay></audio>
+  <audio id="scareAudio" src="scream.mp3"></audio>
+  <div class="jump-scare" id="jump"></div>
 
   <script>
     const game = document.getElementById('game');
     const audio = document.getElementById('bgAudio');
+    const scareAudio = document.getElementById('scareAudio');
     const map = document.getElementById('map');
     const timer = document.getElementById('timer');
+    const wrongDisplay = document.getElementById('wrongDisplay');
+    const jump = document.getElementById('jump');
+    const answerInput = document.getElementById('answerInput');
 
     let startTime = Date.now();
     setInterval(() => {
-      let elapsed = Math.floor((Date.now() - startTime) / 1000);
-      let minutes = Math.floor(elapsed / 60);
-      let seconds = elapsed % 60;
-      timer.textContent = `⏱️ Time: ${minutes}m ${seconds}s`;
+      if (timer) {
+        let elapsed = Math.floor((Date.now() - startTime) / 1000);
+        let minutes = Math.floor(elapsed / 60);
+        let seconds = elapsed % 60;
+        timer.textContent = `⏱️ Time: ${minutes}m ${seconds}s`;
+      }
     }, 1000);
+
+    const puzzleData = [
+      { puzzle: "What has keys but can't open locks?", answer: "keyboard" },
+      { puzzle: "What has hands but can’t clap?", answer: "clock" },
+      { puzzle: "The more you take, the more you leave behind. What am I?", answer: "footsteps" },
+      { puzzle: "What can travel around the world while staying in one spot?", answer: "stamp" },
+      { puzzle: "What gets wetter the more it dries?", answer: "towel" },
+      { puzzle: "I speak without a mouth and hear without ears. What am I?", answer: "echo" },
+      { puzzle: "What has a heart that doesn’t beat?", answer: "artichoke" },
+      { puzzle: "What goes up but never comes down?", answer: "age" },
+      { puzzle: "I’m tall when I’m young and short when I’m old. What am I?", answer: "candle" },
+      { puzzle: "What runs, but never walks, has a bed but never sleeps?", answer: "river" },
+      { puzzle: "I have branches, but no fruit, trunk or leaves. What am I?", answer: "bank" },
+      { puzzle: "What begins with T, ends with T, and has T in it?", answer: "teapot" },
+      { puzzle: "The more you take, the bigger I get. What am I?", answer: "hole" },
+      { puzzle: "What comes once in a minute, twice in a moment, but never in a thousand years?", answer: "m" },
+      { puzzle: "What has an eye but can’t see?", answer: "needle" },
+      { puzzle: "What invention lets you look right through a wall?", answer: "window" },
+      { puzzle: "What has one head, one foot, and four legs?", answer: "bed" },
+      { puzzle: "If you drop me, I’m sure to crack, but give me a smile and I’ll always smile back. What am I?", answer: "mirror" },
+      { puzzle: "What word is spelled incorrectly in every dictionary?", answer: "incorrectly" },
+      { puzzle: "What can fill a room but takes up no space?", answer: "light" }
+    ];
 
     const sayings = [
       "Shower thought: If you clean a vacuum cleaner, you become the vacuum cleaner.",
@@ -126,83 +144,78 @@
     ];
 
     const rooms = Array.from({ length: 50 }, (_, i) => {
+      const puzzleIndex = i % puzzleData.length;
+      const sayingIndex = i % sayings.length;
+      const roomPuzzle = puzzleData[puzzleIndex];
+
       return {
         title: `Room ${i + 1}`,
         desc: `You enter room ${i + 1}. Shadows crawl and time feels slower here.`,
-        story: `${sayings[i % sayings.length]}<br><br>Room ${i + 1} was once a testing ground. The walls whisper secrets of past challengers. Look and listen — clues may hide in humor, wisdom, or wonder.`,
-        puzzle: `What's your next move?`,
-        answer: "next"
+        story: `${sayings[sayingIndex]}<br><br>This place feels different... like something is always behind you.`,
+        puzzle: roomPuzzle.puzzle,
+        answer: roomPuzzle.answer
       };
     });
 
-    rooms[0].story = "Wise saying: Even the greatest was once a beginner. Don’t be afraid to take that first step.<br><br>You awaken chained in a cold digital dungeon. Screens flicker and one reads: 'The answer opens the path. Think of what can't open locks but holds many keys.'";
+    rooms[0].story = "Wise saying: Even the greatest was once a beginner. Don’t be afraid to take that first step.<br><br>You awaken chained in a digital dungeon. The walls drip with static. A screen flickers: 'The answer opens the path. Think of what can't open locks but holds many keys.'";
     rooms[0].puzzle = "What has keys but can't open locks?";
     rooms[0].answer = "keyboard";
 
     let currentRoom = 0;
+
     function delay(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    async function renderRoom() {
-      const room = rooms[currentRoom];
-      updateMap();
-      game.innerHTML = `
-        <div class="room visible">
-          <div class="lock-animation"></div>
-          <h2>${room.title}</h2>
-          <p><em>${room.story}</em></p>
-        </div>
-      `;
-      await delay(Math.max(15000, room.story.length * 50));
-      game.innerHTML += `
-        <p>${room.desc}</p>
-        <p><strong>Riddle:</strong> ${room.puzzle}</p>
-        <input type="text" id="answerInput" placeholder="Your answer...">
-        <br>
-        <button onclick="submitAnswer()">Submit</button>
-      `;
+    function showWrongEffect() {
+      if (wrongDisplay) {
+        wrongDisplay.style.display = 'block';
+        document.body.style.backgroundColor = '#300';
+        setTimeout(() => {
+          wrongDisplay.style.display = 'none';
+          document.body.style.backgroundColor = '#111';
+        }, 1500);
+      }
     }
 
-    function updateMap() {
-      let mapHTML = '🗺️ Progress:<br>';
-      for (let i = 0; i < rooms.length; i++) {
-        if (i === currentRoom) {
-          mapHTML += `<span class="active" style="color: yellow">Room ${i + 1}</span>`;
-        } else if (i === currentRoom + 1) {
-          mapHTML += `<span class="preview" style="color: #777">Room ${i + 1}</span>`;
-        }
+    function showJumpScare() {
+      if (jump && scareAudio) {
+        jump.style.display = 'block';
+        scareAudio.play();
+        setTimeout(() => {
+          jump.style.display = 'none';
+        }, 1000);
       }
-      map.innerHTML = mapHTML;
+    }
+
+    function displayRoom() {
+      if (currentRoom >= rooms.length) {
+        game.innerHTML = `<h1>You escaped! 🎉</h1><p>Total Time: ${timer.textContent}</p>`;
+        document.getElementById('inputArea').style.display = 'none';
+        return;
+      }
+      const room = rooms[currentRoom];
+      game.innerHTML = `<h2>${room.title}</h2><p>${room.desc}</p><p>${room.story}</p><h3>Puzzle:</h3><p>${room.puzzle}</p>`;
+    }
+
+    function checkAnswer(input) {
+      const room = rooms[currentRoom];
+      if (input.trim().toLowerCase() === room.answer) {
+        currentRoom++;
+        displayRoom();
+      } else {
+        showWrongEffect();
+        if (Math.random() < 0.3) showJumpScare();
+      }
     }
 
     function submitAnswer() {
-      const input = document.getElementById('answerInput').value.trim().toLowerCase();
-      if (input === rooms[currentRoom].answer.toLowerCase()) {
-        currentRoom++;
-        if (currentRoom >= rooms.length) {
-          renderWin();
-        } else {
-          renderRoom();
-        }
-      } else {
-        alert("Wrong answer! Try again.");
-      }
+      checkAnswer(answerInput.value);
+      answerInput.value = '';
     }
 
-    function renderWin() {
-      game.innerHTML = `
-        <div class="room visible">
-          <div class="lock-animation"></div>
-          <h2 id="win">🎉 YOU ESCAPED ALL 50 ROOMS! 🎉</h2>
-          <p>Respect from CAWT-GPT: LEGENDARY. Your mind is unmatched!</p>
-        </div>
-      `;
-      audio.pause();
-      updateMap();
-    }
-
-    renderRoom();
+    // Start the game
+    displayRoom();
   </script>
 </body>
 </html>
