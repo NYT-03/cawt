@@ -307,79 +307,79 @@
     <script>
         const rooms = [
             {
-                code: "FEAR",
-                clue: "The paintings watch you with malice. What do they make you feel?",
-                story: "You awake in a cursed gallery, paintings glaring with eyes that follow. Their gaze whispers a riddle to escape.",
+                code: "ECHO",
+                clue: "I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?",
+                story: "The gallery whispers your name, a sound bouncing off cursed walls, demanding a word to unlock the door.",
                 background: "https://images.pexels.com/photos/2088210/pexels-photo-2088210.jpeg" // Shadowy monster
             },
             {
-                code: "BLOOD",
-                clue: "The canvas drips with this substance.",
-                story: "The walls ooze red, a canvas weeping a word that binds the damned.",
+                code: "PIANO",
+                clue: "I have keys but can't open locks. What am I?",
+                story: "A piano in the corner plays itself, its keys spelling a word in the dark.",
                 background: "https://images.pexels.com/photos/1441058/pexels-photo-1441058.jpeg" // Blood and skulls
             },
             {
-                code: "GHOST",
-                clue: "The figure in the portrait that moves when you turn away.",
-                story: "A portrait’s figure vanishes, leaving a word etched in frost.",
+                code: "RIVER",
+                clue: "I run but never walk, have a bed but never sleep. What am I?",
+                story: "The floor ripples like water, a word carved in the current guiding you forward.",
                 background: "https://images.pexels.com/photos/572708/pexels-photo-572708.jpeg" // Ghostly shapes
             },
             {
-                code: "SCREAM",
-                clue: "The sound echoing from the walls.",
-                story: "A scream pierces the silence, its source a word carved into stone.",
+                code: "SHADOW",
+                clue: "I follow you always but flee from light. What am I?",
+                story: "Your shadow moves on its own, whispering a word in the flickering light.",
                 background: "https://images.pexels.com/photos/3750777/pexels-photo-3750777.jpeg" // Demonic figures
             },
             {
-                code: "CURSE",
-                clue: "The spell binding the gallery’s victims.",
-                story: "The air hums with a malevolent spell, its name written in shadows.",
+                code: "CANDLE",
+                clue: "I burn without a flame, my life shortens as I give light. What am I?",
+                story: "A candle drips wax, forming a word as it gutters in the cursed air.",
                 background: "https://images.pexels.com/photos/305839/pexels-photo-305839.jpeg" // Cursed ambiance
             },
             {
-                code: "DEATH",
-                clue: "The fate of those who fail to escape.",
-                story: "A skeletal hand scrawls a word on the floor, a warning of doom.",
+                code: "MIRROR",
+                clue: "I show you what you are but never what you see. What am I?",
+                story: "A mirror reflects a twisted face, a word etched in its glass.",
                 background: "https://images.pexels.com/photos/3682157/pexels-photo-3682157.jpeg" // Skulls and bones
             },
             {
-                code: "PAINT",
-                clue: "The medium that traps the souls.",
-                story: "Paint cans spill, forming a word that seals the gallery’s curse.",
+                code: "DREAM",
+                clue: "I am where you go when you sleep, but I vanish when you wake. What am I?",
+                story: "The gallery shifts like a nightmare, a word forming in the haze.",
                 background: "https://images.pexels.com/photos/459038/pexels-photo-459038.jpeg" // Paint with eerie shapes
             },
             {
-                code: "EYES",
-                clue: "They watch you from every canvas.",
-                story: "Eyes in the paintings glow, their word burning in the dark.",
+                code: "SILENCE",
+                clue: "The less you hear, the louder I am. What am I?",
+                story: "The gallery falls deathly quiet, a word echoing in the absence of sound.",
                 background: "https://images.pexels.com/photos/167964/pexels-photo-167964.jpeg" // Monster eyes
             },
             {
-                code: "VOID",
-                clue: "The darkness behind the torn canvas.",
-                story: "A torn canvas reveals a black abyss, whispering a single word.",
+                code: "RIDDLE",
+                clue: "I am a question wrapped in words, solved by wit. What am I?",
+                story: "The paintings mock you with puzzles, a word carved into their frames.",
                 background: "https://images.pexels.com/photos/373543/pexels-photo-373543.jpeg" // Dark void with creatures
             },
             {
-                code: "SOUL",
-                clue: "What the gallery steals from you.",
-                story: "A mirror reflects no face, only a word etched in blood.",
+                code: "FOOTPRINTS",
+                clue: "The more you take, the more you leave behind. What am I?",
+                story: "Footprints trail you, forming a word in the dust of the cursed floor.",
                 background: "https://images.pexels.com/photos/235985/pexels-photo-235985.jpeg" // Soul-like shadows
             },
             {
-                code: "BONE",
-                clue: "The remains scattered on the floor.",
-                story: "Bones crunch underfoot, spelling a word in the dim light.",
+                code: "TOMORROW",
+                clue: "I am always coming but never arrive. What am I?",
+                story: "A clock ticks backward, its hands spelling a word of lost time.",
                 background: "https://images.pexels.com/photos/1762851/pexels-photo-1762851.jpeg" // Skulls and monsters
             },
             {
-                code: "8421",
-                clue: "The final key to skip rooms lies in the monster’s gaze.",
+                code: "6799",
+                clue: "The final key to skip rooms lies in the monster’s gaze. Enter the four-digit code.",
                 story: "Monsters from forgotten games leer, skulls grinning. Enter the final code to skip ahead.",
                 background: "https://images.pexels.com/photos/2088209/pexels-photo-2088209.jpeg" // Monster-heavy with skulls
             }
             // Extend to 30 rooms, e.g.:
-            // { code: "HAUNT", clue: "The sound of footsteps behind you.", story: "Footsteps echo, forming a word in the dark.", background: "https://images.pexels.com/photos/235985/pexels-photo-235985.jpeg" }
+            // { code: "SECRET", clue: "I am hidden but always there, revealed only to those who seek. What am I?", story: "A hidden panel clicks, revealing a word in the shadows.", background: "https://images.pexels.com/photos/235985/pexels-photo-235985.jpeg" }
         ];
         let currentRoom = 0;
         let clueCount = 0;
@@ -387,6 +387,7 @@
         let clueAttempts = 0;
         let inSpecialRoom = false;
         let timeLeft = 1200; // 20 minutes in seconds
+        let autoSubmitTimeout = null;
 
         const blackScreen = document.getElementById('black-screen');
         const loadingCircle = document.getElementById('loading-circle');
@@ -415,6 +416,23 @@
         // Disable clue and home buttons initially
         clueButton.disabled = true;
         homeButton.style.display = 'none';
+
+        // Auto-submit logic for special room
+        function scheduleAutoSubmit() {
+            if (inSpecialRoom && codeInput.value.trim().length > 0) {
+                clearTimeout(autoSubmitTimeout);
+                autoSubmitTimeout = setTimeout(() => {
+                    submitCode();
+                }, 5000); // 5 seconds
+            }
+        }
+
+        // Handle input changes
+        codeInput.addEventListener('input', () => {
+            if (inSpecialRoom) {
+                scheduleAutoSubmit();
+            }
+        });
 
         // Timer logic
         function updateTimer() {
@@ -503,6 +521,7 @@
 
         // Handle home button
         homeButton.addEventListener('click', () => {
+            clearTimeout(autoSubmitTimeout);
             currentRoom = 0;
             inSpecialRoom = false;
             roomTitle.textContent = `Room 1`;
@@ -523,14 +542,18 @@
         document.querySelectorAll('.dial-button').forEach(button => {
             button.addEventListener('click', () => {
                 codeInput.value += button.getAttribute('data-value');
+                if (inSpecialRoom) {
+                    scheduleAutoSubmit();
+                }
             });
         });
 
         // Handle code submission
-        submitButton.addEventListener('click', () => {
+        function submitCode() {
             const input = codeInput.value.trim().toUpperCase();
             if (inSpecialRoom) {
                 if (input === rooms[rooms.length - 1].code) {
+                    clearTimeout(autoSubmitTimeout);
                     transitionToRoom(6); // Skip to Room 7 (skipping 5 rooms: 2-6)
                 } else {
                     message.textContent = "WRONG";
@@ -538,6 +561,7 @@
                     screamSound.play().catch(() => {});
                     homeButton.style.display = 'inline-block';
                     setTimeout(() => {
+                        clearTimeout(autoSubmitTimeout);
                         transitionToRoom(1); // Auto-advance to Room 2
                     }, 3000);
                 }
@@ -551,10 +575,12 @@
                     riddleDisplay.textContent = rooms[rooms.length - 1].clue;
                     gameContainer.style.background = `url('${rooms[rooms.length - 1].background}') no-repeat center/cover`;
                     codeInput.value = '';
-                    codeInput.style.display = 'none';
+                    codeInput.style.display = 'inline-block';
                     dialPad.style.display = 'grid';
-                    message.textContent = "Enter the final code using the dial pad.";
+                    submitButton.style.display = 'none';
+                    message.textContent = "Enter the final code using the dial pad or keyboard. Code will submit after 5 seconds.";
                     roomDisplay.classList.add('fade-in');
+                    scheduleAutoSubmit();
                 } else {
                     message.textContent = "WRONG";
                     message.classList.add('wrong');
@@ -578,6 +604,13 @@
                     message.textContent = '';
                     codeInput.value = '';
                 }, 3000);
+            }
+        }
+
+        // Handle manual submission (non-special rooms)
+        submitButton.addEventListener('click', () => {
+            if (!inSpecialRoom) {
+                submitCode();
             }
         });
 
@@ -604,6 +637,7 @@
                             message.textContent = '';
                             codeInput.style.display = 'inline-block';
                             dialPad.style.display = 'none';
+                            submitButton.style.display = 'inline-block';
                             blackScreen.classList.add('fade-out');
                             setTimeout(() => {
                                 blackScreen.style.display = 'none';
@@ -653,6 +687,7 @@
                         message.textContent = '';
                         codeInput.style.display = 'inline-block';
                         dialPad.style.display = 'none';
+                        submitButton.style.display = 'inline-block';
                         homeButton.style.display = 'none';
                         blackScreen.classList.add('fade-out');
                         setTimeout(() => {
