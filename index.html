@@ -11,8 +11,8 @@
             padding: 0;
             overflow: hidden;
             font-family: 'Times New Roman', Times, serif;
-            background: #1a0000;
-            color: #000000;
+            background: #000000;
+            color: #999999;
         }
         #game-container {
             width: 100vw;
@@ -22,6 +22,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            background: #000000;
             transition: background 1s ease;
         }
         #intro-video {
@@ -39,7 +40,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: black;
+            background: #000000;
             opacity: 0;
             z-index: 11;
             pointer-events: none;
@@ -51,7 +52,7 @@
             transform: translate(-50%, -50%);
             width: 50px;
             height: 50px;
-            border: 5px solid #ff1a1a;
+            border: 5px solid #999999;
             border-top: 5px solid transparent;
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -65,7 +66,7 @@
         #lock {
             position: absolute;
             font-size: 120px;
-            color: #ff1a1a;
+            color: #999999;
             text-shadow: 0 0 10px #ff0000;
             z-index: 15;
             display: none;
@@ -91,12 +92,12 @@
             100% { transform: translate(0, 0); opacity: 1; }
         }
         @keyframes glitch-text {
-            0% { transform: skew(0deg); opacity: 1; color: #000000; }
+            0% { transform: skew(0deg); opacity: 1; color: #999999; }
             20% { transform: skew(5deg); opacity: 0.8; color: #cc00cc; }
-            40% { transform: skew(-5deg); opacity: 0.6; color: #000000; }
+            40% { transform: skew(-5deg); opacity: 0.6; color: #999999; }
             60% { transform: skew(3deg); opacity: 0.9; color: #cc00cc; }
-            80% { transform: skew(-3deg); opacity: 0.7; color: #000000; }
-            100% { transform: skew(0deg); opacity: 1; color: #000000; }
+            80% { transform: skew(-3deg); opacity: 0.7; color: #999999; }
+            100% { transform: skew(0deg); opacity: 1; color: #999999; }
         }
         @keyframes twitch {
             0% { transform: translate(0, 0); }
@@ -139,12 +140,12 @@
             animation: scary-end 2s infinite alternate;
         }
         @keyframes scary-end {
-            0% { transform: scale(1); opacity: 1; color: #ff1a1a; }
+            0% { transform: scale(1); opacity: 1; color: #999999; }
             20% { transform: scale(1.1) skew(5deg); opacity: 0.7; color: #cc00cc; }
-            40% { transform: scale(0.9) skew(-5deg); opacity: 0.5; color: #ff1a1a; }
+            40% { transform: scale(0.9) skew(-5deg); opacity: 0.5; color: #999999; }
             60% { transform: scale(1.05) skew(3deg); opacity: 0.8; color: #cc00cc; }
-            80% { transform: scale(0.95) skew(-3deg); opacity: 0.6; color: #ff1a1a; }
-            100% { transform: scale(1); opacity: 1; color: #ff1a1a; }
+            80% { transform: scale(0.95) skew(-3deg); opacity: 0.6; color: #999999; }
+            100% { transform: scale(1); opacity: 1; color: #999999; }
         }
         #room {
             text-align: center;
@@ -180,9 +181,9 @@
             position: absolute;
             top: 10px;
             left: 10px;
-            background: #2a0000;
+            background: #000000;
             padding: 10px;
-            border: 2px solid #ff3333;
+            border: 2px solid #333333;
             border-radius: 5px;
         }
         #timer {
@@ -190,20 +191,24 @@
             top: 10px;
             right: 10px;
             font-size: 24px;
-            color: #ff1a1a;
-            text-shadow: 0 0 5px #ff0000;
+            color: #999999;
+            text-shadow: 0 0 10px #ff0000;
             font-family: 'Creepster', cursive;
         }
         #clue-button, #submit-button, #home-button {
             padding: 10px 20px;
             margin: 5px;
             cursor: pointer;
-            background: #660000;
-            border: none;
-            color: #ff9999;
+            background: #000000;
+            border: 2px solid #333333;
+            color: #999999;
             border-radius: 5px;
             font-family: 'Times New Roman', Times, serif;
             font-size: 24px;
+            text-shadow: 0 0 5px #ffffff;
+        }
+        #clue-button:hover, #submit-button:hover, #home-button:hover {
+            background: #666666;
         }
         #clue-button.glitch-red {
             background: #ff0000;
@@ -216,9 +221,9 @@
             padding: 10px;
             margin: 10px;
             font-size: 24px;
-            background: #2a0000;
-            color: #000000;
-            border: 2px solid #ff3333;
+            background: #000000;
+            color: #999999;
+            border: 2px solid #333333;
             border-radius: 5px;
             font-family: 'Times New Roman', Times, serif;
             text-shadow: 0 0 5px #ffffff;
@@ -232,18 +237,19 @@
         .dial-button {
             width: 60px;
             height: 60px;
-            background: #330000;
-            border: 2px solid #ff3333;
-            color: #ff9999;
+            background: #000000;
+            border: 2px solid #333333;
+            color: #999999;
             font-family: 'Times New Roman', Times, serif;
             font-size: 24px;
             cursor: pointer;
             border-radius: 5px;
             text-align: center;
             line-height: 60px;
+            text-shadow: 0 0 5px #ffffff;
         }
         .dial-button:hover {
-            background: #660000;
+            background: #666666;
         }
         #message {
             margin-top: 10px;
@@ -258,7 +264,7 @@
         }
         #message.game-over {
             font-size: 48px;
-            color: #ff1a1a;
+            color: #999999;
             text-shadow: 0 0 10px #ff0000;
             animation: scary-end 2s infinite alternate;
         }
@@ -286,7 +292,7 @@
             </div>
             <div id="story"></div>
             <div id="riddle"></div>
-            <h1 id="room-title" style="font-family: 'Creepster', cursive;">Room 1</h1>
+            <h1 id="room-title" style="font-family: 'Creepster', cursive; color: #999999; text-shadow: 0 0 10px #ff0000;">Room 1</h1>
             <input type="text" id="code-input" placeholder="Enter answer or code">
             <div id="dial-pad">
                 <div class="dial-button" data-value="1">1</div>
@@ -310,76 +316,76 @@
                 code: "ECHO",
                 clue: "I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?",
                 story: "The gallery whispers your name, a sound bouncing off cursed walls, demanding a word to unlock the door.",
-                background: "https://images.pexels.com/photos/2088210/pexels-photo-2088210.jpeg" // Shadowy monster
+                background: "#000000"
             },
             {
                 code: "PIANO",
                 clue: "I have keys but can't open locks. What am I?",
                 story: "A piano in the corner plays itself, its keys spelling a word in the dark.",
-                background: "https://images.pexels.com/photos/1441058/pexels-photo-1441058.jpeg" // Blood and skulls
+                background: "#000000"
             },
             {
                 code: "RIVER",
                 clue: "I run but never walk, have a bed but never sleep. What am I?",
                 story: "The floor ripples like water, a word carved in the current guiding you forward.",
-                background: "https://images.pexels.com/photos/572708/pexels-photo-572708.jpeg" // Ghostly shapes
+                background: "#000000"
             },
             {
                 code: "SHADOW",
                 clue: "I follow you always but flee from light. What am I?",
                 story: "Your shadow moves on its own, whispering a word in the flickering light.",
-                background: "https://images.pexels.com/photos/3750777/pexels-photo-3750777.jpeg" // Demonic figures
+                background: "#000000"
             },
             {
                 code: "CANDLE",
                 clue: "I burn without a flame, my life shortens as I give light. What am I?",
                 story: "A candle drips wax, forming a word as it gutters in the cursed air.",
-                background: "https://images.pexels.com/photos/305839/pexels-photo-305839.jpeg" // Cursed ambiance
+                background: "#000000"
             },
             {
                 code: "MIRROR",
                 clue: "I show you what you are but never what you see. What am I?",
                 story: "A mirror reflects a twisted face, a word etched in its glass.",
-                background: "https://images.pexels.com/photos/3682157/pexels-photo-3682157.jpeg" // Skulls and bones
+                background: "#000000"
             },
             {
                 code: "DREAM",
                 clue: "I am where you go when you sleep, but I vanish when you wake. What am I?",
                 story: "The gallery shifts like a nightmare, a word forming in the haze.",
-                background: "https://images.pexels.com/photos/459038/pexels-photo-459038.jpeg" // Paint with eerie shapes
+                background: "#000000"
             },
             {
                 code: "SILENCE",
                 clue: "The less you hear, the louder I am. What am I?",
                 story: "The gallery falls deathly quiet, a word echoing in the absence of sound.",
-                background: "https://images.pexels.com/photos/167964/pexels-photo-167964.jpeg" // Monster eyes
+                background: "#000000"
             },
             {
                 code: "RIDDLE",
                 clue: "I am a question wrapped in words, solved by wit. What am I?",
                 story: "The paintings mock you with puzzles, a word carved into their frames.",
-                background: "https://images.pexels.com/photos/373543/pexels-photo-373543.jpeg" // Dark void with creatures
+                background: "#000000"
             },
             {
                 code: "FOOTPRINTS",
                 clue: "The more you take, the more you leave behind. What am I?",
                 story: "Footprints trail you, forming a word in the dust of the cursed floor.",
-                background: "https://images.pexels.com/photos/235985/pexels-photo-235985.jpeg" // Soul-like shadows
+                background: "#000000"
             },
             {
                 code: "TOMORROW",
                 clue: "I am always coming but never arrive. What am I?",
                 story: "A clock ticks backward, its hands spelling a word of lost time.",
-                background: "https://images.pexels.com/photos/1762851/pexels-photo-1762851.jpeg" // Skulls and monsters
+                background: "#000000"
             },
             {
                 code: "6799",
                 clue: "The final key to skip rooms lies in the monster’s gaze. Enter the four-digit code.",
                 story: "Monsters from forgotten games leer, skulls grinning. Enter the final code to skip ahead.",
-                background: "https://images.pexels.com/photos/2088209/pexels-photo-2088209.jpeg" // Monster-heavy with skulls
+                background: "#000000"
             }
             // Extend to 30 rooms, e.g.:
-            // { code: "SECRET", clue: "I am hidden but always there, revealed only to those who seek. What am I?", story: "A hidden panel clicks, revealing a word in the shadows.", background: "https://images.pexels.com/photos/235985/pexels-photo-235985.jpeg" }
+            // { code: "SECRET", clue: "I am hidden but always there, revealed only to those who seek. What am I?", story: "A hidden panel clicks, revealing a word in the shadows.", background: "#000000" }
         ];
         let currentRoom = 0;
         let clueCount = 0;
@@ -406,11 +412,12 @@
         const riddleDisplay = document.getElementById('riddle');
         const timerDisplay = document.getElementById('timer');
         const gameContainer = document.getElementById('game-container');
+
         const screamSound = document.getElementById('scream-sound');
         const transitionSound = document.getElementById('transition-sound');
 
         // Set initial background and riddle
-        gameContainer.style.background = `url('${rooms[0].background}') no-repeat center/cover`;
+        gameContainer.style.background = rooms[0].background;
         riddleDisplay.textContent = rooms[0].clue;
 
         // Disable clue and home buttons initially
@@ -527,7 +534,7 @@
             roomTitle.textContent = `Room 1`;
             storyDisplay.textContent = rooms[0].story;
             riddleDisplay.textContent = rooms[0].clue;
-            gameContainer.style.background = `url('${rooms[0].background}') no-repeat center/cover`;
+            gameContainer.style.background = rooms[0].background;
             codeInput.value = '';
             codeInput.style.display = 'inline-block';
             dialPad.style.display = 'none';
@@ -573,7 +580,7 @@
                     roomTitle.textContent = "Cursed Chamber";
                     storyDisplay.textContent = rooms[rooms.length - 1].story;
                     riddleDisplay.textContent = rooms[rooms.length - 1].clue;
-                    gameContainer.style.background = `url('${rooms[rooms.length - 1].background}') no-repeat center/cover`;
+                    gameContainer.style.background = rooms[rooms.length - 1].background;
                     codeInput.value = '';
                     codeInput.style.display = 'inline-block';
                     dialPad.style.display = 'grid';
@@ -632,7 +639,7 @@
                             roomTitle.textContent = `Room ${currentRoom + 1}`;
                             storyDisplay.textContent = rooms[currentRoom].story;
                             riddleDisplay.textContent = rooms[currentRoom].clue;
-                            gameContainer.style.background = `url('${rooms[currentRoom].background}') no-repeat center/cover`;
+                            gameContainer.style.background = rooms[currentRoom].background;
                             codeInput.value = '';
                             message.textContent = '';
                             codeInput.style.display = 'inline-block';
@@ -650,7 +657,7 @@
                             riddleDisplay.textContent = "";
                             roomTitle.textContent = "Escape Complete";
                             message.textContent = "Congratulations! You survived!";
-                            gameContainer.style.background = `url('https://images.pexels.com/photos/1762851/pexels-photo-1762851.jpeg') no-repeat center/cover`;
+                            gameContainer.style.background = "#000000";
                             codeInput.style.display = 'none';
                             submitButton.style.display = 'none';
                             clueButton.style.display = 'none';
@@ -682,7 +689,7 @@
                         roomTitle.textContent = `Room ${currentRoom + 1}`;
                         storyDisplay.textContent = rooms[currentRoom].story;
                         riddleDisplay.textContent = rooms[currentRoom].clue;
-                        gameContainer.style.background = `url('${rooms[currentRoom].background}') no-repeat center/cover`;
+                        gameContainer.style.background = rooms[currentRoom].background;
                         codeInput.value = '';
                         message.textContent = '';
                         codeInput.style.display = 'inline-block';
