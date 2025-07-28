@@ -1,1019 +1,670 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CAWT ESCAPE ROOM</title>
-  <style>
-    body {
-      background: #111;
-      color: white;
-      font-family: 'Courier New', Courier, monospace;
-      overflow: hidden;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-
-    /* Home Page Styles */
-    #home-page {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: #222; /* Dark grey */
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 10000;
-      color: #eee; /* White text */
-    }
-
-    #home-title {
-      font-size: 4em;
-      color: #eee;
-      text-shadow: 0 0 10px #aaa;
-      margin-bottom: 40px;
-      animation: pulse-white 2s infinite alternate;
-    }
-
-    #home-options button {
-      background: #444; /* Slightly lighter grey for buttons */
-      color: #eee;
-      border: 2px solid #eee;
-      padding: 15px 30px;
-      margin: 15px;
-      font-size: 1.8em;
-      cursor: pointer;
-      transition: background 0.3s, color 0.3s, border-color 0.3s;
-      border-radius: 8px;
-    }
-
-    #home-options button:hover {
-      background: #eee;
-      color: #222;
-      border-color: #444;
-    }
-
-    /* Game and Story Containers */
-    #game-container, #paining-truth-story {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      display: none; /* Hidden by default */
-    }
-
-    /* Existing Game Styles (from previous update) */
-    #game, #timer, #wrongDisplay, #clueCounter, #story, #intro, #blood-transition, #message-area {
-      position: absolute;
-      padding: 10px;
-      z-index: 2;
-    }
-
-    #game {
-      position: relative; /* Changed from absolute to relative to allow normal flow */
-      text-align: center;
-      display: flex; /* Make it a flex container */
-      flex-direction: column; /* Stack children vertically */
-      justify-content: center; /* Center content vertically */
-      align-items: center; /* Center content horizontally */
-      width: 80%;
-      max-width: 800px;
-      min-height: 300px; /* Ensure a minimum height */
-      margin: auto; /* Center horizontally */
-      padding: 20px; /* Add overall padding */
-      box-sizing: border-box; /* Include padding in width/height */
-    }
-
-    #story { /* This is the intro story for each room, not the main game riddle display */
-      top: 20%;
-      font-size: 1.4em;
-      color: #f33;
-      text-shadow: 0 0 10px red;
-      animation: glitch 2s infinite;
-      max-width: 80%;
-      margin: auto;
-      user-select: none;
-      display: none;
-      position: absolute; /* Keep absolute for overlay effect */
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    #timer {
-      top: 10px;
-      right: 10px;
-      display: none;
-      font-size: 1.2em;
-      color: #f00;
-      text-shadow: 0 0 5px red;
-    }
-
-    #clueCounter {
-      top: 10px;
-      left: 10px;
-      display: none;
-    }
-
-    #wrongDisplay {
-      top: 40%;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 5em;
-      color: red;
-      display: none;
-      text-shadow: 0 0 10px red;
-      font-weight: bold;
-      animation: glitch 1s infinite;
-      user-select: none;
-    }
-
-    #lockIcon {
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 5em;
-      display: none;
-      text-shadow: 0 0 20px red;
-      user-select: none;
-    }
-
-    #inputArea {
-      position: relative; /* Changed from absolute */
-      bottom: auto; /* Remove bottom positioning */
-      left: auto; /* Remove left positioning */
-      transform: none; /* Remove transform */
-      margin-top: 20px; /* Space above input area */
-      width: 100%; /* Take full width of parent (#game) */
-      gap: 10px;
-      align-items: center;
-      display: flex; /* Keep as flex */
-      flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
-      justify-content: center; /* Center buttons */
-    }
-
-    input[type="text"] {
-      flex: 1;
-      padding: 10px;
-      font-size: 1em;
-      background: #222;
-      color: white;
-      border: 1px solid #444;
-      transition: box-shadow 0.3s ease-in-out;
-    }
-
-    input[type="text"]:focus {
-      outline: none;
-      background: #222;
-      color: white;
-    }
-
-    .input-error {
-      box-shadow: 0 0 8px 3px red;
-      animation: glitch 0.3s infinite;
-    }
-
-    button {
-      padding: 10px 20px;
-      background: #c00;
-      color: white;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-      user-select: none;
-      transition: background 0.3s ease;
-      border-radius: 4px; /* Added for consistency */
-    }
-
-    button:disabled {
-      background: #555;
-      cursor: not-allowed;
-    }
-
-    button.choice {
-      background: #222;
-      border: 2px solid #c00;
-      font-weight: normal;
-      font-size: 1.2em;
-      flex: none;
-      padding: 10px 15px;
-      transition: background 0.3s, color 0.3s;
-      border-radius: 4px; /* Added for consistency */
-    }
-
-    button.choice:hover {
-      background: #c00;
-      color: white;
-    }
-
-    .glitch {
-      animation: glitch 1s infinite;
-    }
-
-    @keyframes glitch {
-      0% { text-shadow: 2px 0 red, -2px 0 blue; }
-      20% { text-shadow: -2px 0 red, 2px 0 blue; }
-      40% { text-shadow: 2px 2px red, -2px -2px blue; }
-      60% { text-shadow: -2px 2px red, 2px -2px blue; }
-      80% { text-shadow: 2px -2px red, -2px 2px blue; }
-      100% { text-shadow: -2px 0 red, 2px 0 blue; }
-    }
-
-    h2 {
-      font-size: 2.5em;
-      color: #f00;
-      text-shadow: 0 0 10px red, 0 0 20px red;
-      margin-bottom: 0.3em;
-    }
-
-    p {
-      font-size: 1.5em;
-      color: #ddd;
-      text-shadow: 1px 1px 5px #f00, -1px -1px 5px #000;
-      filter: contrast(1.2) brightness(1.1);
-      animation: glitch 2s infinite;
-      margin-top: 0.3em;
-    }
-
-    /* Intro styles (for Escape Room) */
-    #intro {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: #111;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      display: none; /* Hidden by default */
-    }
-
-    #intro-title {
-      font-size: 4em;
-      color: #f00;
-      text-shadow: 0 0 15px red, 0 0 30px red;
-      animation: glitch 1.5s infinite;
-      margin-bottom: 20px;
-    }
-
-    #intro-loader {
-      width: 60px;
-      height: 60px;
-      border: 8px solid #f00;
-      border-top: 8px solid #111;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      display: none;
-    }
-
-    #intro-story {
-      font-size: 1.5em;
-      color: #ddd;
-      text-shadow: 1px 1px 5px #f00;
-      max-width: 80%;
-      text-align: center;
-      position: relative;
-      display: none;
-      animation: shake 0.1s infinite, glitch 2s infinite;
-    }
-
-    #intro-story::after {
-      content: '|';
-      position: absolute;
-      right: -15px;
-      color: #f00;
-      animation: blink 0.7s step-end infinite;
-    }
-
-    #light-dot {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
-      border-radius: 50%;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: none;
-      z-index: 10000;
-    }
-
-    /* Blood transition */
-    #blood-transition {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(to bottom, rgba(139, 0, 0, 0.9) 0%, rgba(139, 0, 0, 0.5) 50%, transparent 100%);
-      opacity: 0;
-      z-index: 1000;
-      display: none;
-    }
-
-    @keyframes blood-flow {
-      0% {
-        opacity: 0;
-        transform: translateY(-100%);
-      }
-      50% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(100%);
-      }
-    }
-
-    #message-area {
-      bottom: 20%;
-      left: 50%;
-      transform: translateX(-50%);
-      text-align: center;
-      font-size: 1.5em;
-      color: yellow;
-      text-shadow: 0 0 5px yellow;
-      display: none;
-      padding: 10px;
-      border: 1px solid yellow;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 10;
-      border-radius: 5px;
-    }
-
-    /* Paining Truth Story Styles */
-    #paining-truth-story {
-      background: #1a1a1a; /* Darker grey for story mode */
-      color: #c0c0c0; /* Lighter grey for text */
-      text-align: center;
-      padding: 20px;
-      box-sizing: border-box;
-      overflow-y: auto;
-      font-size: 1.3em;
-      line-height: 1.6;
-    }
-
-    #paining-truth-text {
-      max-width: 800px;
-      margin: 50px auto;
-      min-height: 200px; /* Ensure space for text */
-      position: relative;
-    }
-
-    #paining-truth-text::after {
-      content: '|';
-      position: absolute;
-      right: -10px;
-      color: #c0c0c0;
-      animation: blink 0.7s step-end infinite;
-    }
-
-    #paining-truth-choices {
-      margin-top: 40px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    /* --- Paining Truth Choice Button Fix --- */
-    #paining-truth-choices button {
-      background: #333;
-      color: #c0c0c0;
-      border: 1px solid #666;
-      padding: 8px 15px; /* Reduced padding */
-      font-size: 0.95em; /* Slightly reduced font size */
-      cursor: pointer;
-      transition: background 0.3s, color 0.3s, border-color 0.3s;
-      border-radius: 5px;
-      white-space: normal; /* Allow text to wrap */
-      text-align: center; /* Center text within button */
-    }
-
-    #paining-truth-choices button:hover {
-      background: #555;
-      color: #fff;
-      border-color: #999;
-    }
-
-    /* Keyframe Animations */
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
-
-    @keyframes shake {
-      0% { transform: translateX(0); }
-      50% { transform: translateX(2px); }
-      100% { transform: translateX(0); }
-    }
-
-    @keyframes light-spread {
-      0% {
-        opacity: 0.2;
-        transform: translate(-50%, -50%) scale(1);
-      }
-      50% {
-        opacity: 0.6;
-        transform: translate(-50%, -50%) scale(50);
-      }
-      100% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(200);
-      }
-    }
-
-    @keyframes pulse-white {
-      0% { text-shadow: 0 0 10px #aaa; }
-      100% { text-shadow: 0 0 20px #fff, 0 0 30px #fff; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAWT Escape Room: The Painting Truth</title>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Times New Roman', Times, serif;
+            background: #1a0000;
+            color: #000000;
+        }
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: background 1s ease;
+        }
+        #intro-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            z-index: 10;
+        }
+        #black-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            opacity: 0;
+            z-index: 11;
+            pointer-events: none;
+        }
+        #loading-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 5px solid #ff1a1a;
+            border-top: 5px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+            z-index: 12;
+        }
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        #lock {
+            position: absolute;
+            font-size: 120px;
+            color: #ff1a1a;
+            text-shadow: 0 0 10px #ff0000;
+            z-index: 15;
+            display: none;
+        }
+        .glitch {
+            animation: glitch 0.3s infinite alternate;
+        }
+        .glitch-text {
+            animation: glitch-text 0.2s infinite alternate;
+        }
+        .twitch {
+            animation: twitch 0.3s infinite alternate;
+        }
+        .glitch-page {
+            animation: glitch-page 0.2s infinite alternate;
+        }
+        @keyframes glitch {
+            0% { transform: translate(0, 0); opacity: 1; }
+            20% { transform: translate(5px, -5px); opacity: 0.7; }
+            40% { transform: translate(-5px, 5px); opacity: 0.5; }
+            60% { transform: translate(3px, 3px); opacity: 0.8; }
+            80% { transform: translate(-3px, -3px); opacity: 0.6; }
+            100% { transform: translate(0, 0); opacity: 1; }
+        }
+        @keyframes glitch-text {
+            0% { transform: skew(0deg); opacity: 1; color: #000000; }
+            20% { transform: skew(5deg); opacity: 0.8; color: #cc00cc; }
+            40% { transform: skew(-5deg); opacity: 0.6; color: #000000; }
+            60% { transform: skew(3deg); opacity: 0.9; color: #cc00cc; }
+            80% { transform: skew(-3deg); opacity: 0.7; color: #000000; }
+            100% { transform: skew(0deg); opacity: 1; color: #000000; }
+        }
+        @keyframes twitch {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(3px, -3px); }
+            40% { transform: translate(-3px, 3px); }
+            60% { transform: translate(2px, -2px); }
+            80% { transform: translate(-2px, 2px); }
+            100% { transform: translate(0, 0); }
+        }
+        @keyframes glitch-page {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(5px, -5px); }
+            40% { transform: translate(-5px, 5px); }
+            60% { transform: translate(3px, 3px); }
+            80% { transform: translate(-3px, -3px); }
+            100% { transform: translate(0, 0); }
+        }
+        .fade-out {
+            animation: fadeOut 1s forwards;
+        }
+        .fade-in {
+            animation: fadeIn 1s forwards;
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .dim {
+            animation: dim 10s linear forwards;
+        }
+        @keyframes dim {
+            from { opacity: 1; }
+            to { opacity: 0.1; }
+        }
+        .scary-end {
+            animation: scary-end 2s infinite alternate;
+        }
+        @keyframes scary-end {
+            0% { transform: scale(1); opacity: 1; color: #ff1a1a; }
+            20% { transform: scale(1.1) skew(5deg); opacity: 0.7; color: #cc00cc; }
+            40% { transform: scale(0.9) skew(-5deg); opacity: 0.5; color: #ff1a1a; }
+            60% { transform: scale(1.05) skew(3deg); opacity: 0.8; color: #cc00cc; }
+            80% { transform: scale(0.95) skew(-3deg); opacity: 0.6; color: #ff1a1a; }
+            100% { transform: scale(1); opacity: 1; color: #ff1a1a; }
+        }
+        #room {
+            text-align: center;
+            max-width: 80%;
+        }
+        #story {
+            font-size: 28px;
+            text-shadow: 0 0 5px #ffffff;
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+            overflow: hidden;
+            border-right: 2px solid #ffffff;
+            animation: typing 5s steps(40, end), blink-caret 0.75s step-end infinite, glitch-text 0.2s infinite alternate;
+        }
+        #riddle {
+            font-size: 24px;
+            text-shadow: 0 0 5px #ffffff;
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+            overflow: hidden;
+            border-right: 2px solid #ffffff;
+            animation: typing 5s steps(40, end), blink-caret 0.75s step-end infinite, glitch-text 0.2s infinite alternate;
+        }
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #ffffff; }
+        }
+        #clue-bar {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #2a0000;
+            padding: 10px;
+            border: 2px solid #ff3333;
+            border-radius: 5px;
+        }
+        #timer {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            color: #ff1a1a;
+            text-shadow: 0 0 5px #ff0000;
+            font-family: 'Creepster', cursive;
+        }
+        #clue-button, #submit-button, #home-button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            background: #660000;
+            border: none;
+            color: #ff9999;
+            border-radius: 5px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 24px;
+        }
+        #clue-button.glitch-red {
+            background: #ff0000;
+            animation: glitch 0.3s infinite alternate;
+        }
+        #home-button {
+            display: none;
+        }
+        #code-input {
+            padding: 10px;
+            margin: 10px;
+            font-size: 24px;
+            background: #2a0000;
+            color: #000000;
+            border: 2px solid #ff3333;
+            border-radius: 5px;
+            font-family: 'Times New Roman', Times, serif;
+            text-shadow: 0 0 5px #ffffff;
+        }
+        #dial-pad {
+            display: none;
+            grid-template-columns: repeat(3, 60px);
+            gap: 10px;
+            margin: 20px auto;
+        }
+        .dial-button {
+            width: 60px;
+            height: 60px;
+            background: #330000;
+            border: 2px solid #ff3333;
+            color: #ff9999;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 5px;
+            text-align: center;
+            line-height: 60px;
+        }
+        .dial-button:hover {
+            background: #660000;
+        }
+        #message {
+            margin-top: 10px;
+            font-size: 36px;
+            text-shadow: 0 0 5px #ffffff;
+            display: none;
+            font-family: 'Times New Roman', Times, serif;
+            animation: glitch-text 0.2s infinite alternate, twitch 0.3s infinite alternate;
+        }
+        #message.wrong {
+            display: block;
+        }
+        #message.game-over {
+            font-size: 48px;
+            color: #ff1a1a;
+            text-shadow: 0 0 10px #ff0000;
+            animation: scary-end 2s infinite alternate;
+        }
+    </style>
 </head>
 <body>
-  <!-- Home Page -->
-  <div id="home-page">
-    <div id="home-title">CAWT GAMES</div>
-    <div id="home-options">
-      <button id="escapeRoomBtn">CAWT ESCAPE ROOM</button>
-      <button id="painingTruthBtn">THE PAINING TRUTH</button>
+    <div id="game-container">
+        <div id="black-screen" class="flicker"></div>
+        <div id="loading-circle"></div>
+        <iframe id="intro-video" src="https://www.youtube.com/embed/S8ZvgZF7ia0?autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        <div id="lock" class="glitch">🔓</div>
+        <audio id="scream-sound" preload="auto">
+            <!-- Replace with your eerie sound file -->
+            <source src="path/to/scream.mp3" type="audio/mp3">
+        </audio>
+        <audio id="transition-sound" preload="auto">
+            <!-- Replace with your transition sound file -->
+            <source src="path/to/creepy-transition.mp3" type="audio/mp3">
+        </audio>
+        <div id="timer">20:00</div>
+        <div id="room">
+            <div id="clue-bar">
+                Clues: <span id="clue-count">0</span>
+                <button id="clue-button">Get Clue</button>
+            </div>
+            <div id="story"></div>
+            <div id="riddle"></div>
+            <h1 id="room-title" style="font-family: 'Creepster', cursive;">Room 1</h1>
+            <input type="text" id="code-input" placeholder="Enter answer or code">
+            <div id="dial-pad">
+                <div class="dial-button" data-value="1">1</div>
+                <div class="dial-button" data-value="2">2</div>
+                <div class="dial-button" data-value="3">3</div>
+                <div class="dial-button" data-value="4">4</div>
+                <div class="dial-button" data-value="5">5</div>
+                <div class="dial-button" data-value="6">6</div>
+                <div class="dial-button" data-value="7">7</div>
+                <div class="dial-button" data-value="8">8</div>
+                <div class="dial-button" data-value="9">9</div>
+            </div>
+            <button id="submit-button">Submit</button>
+            <button id="home-button">Home</button>
+            <div id="message"></div>
+        </div>
     </div>
-  </div>
+    <script>
+        const rooms = [
+            {
+                code: "FEAR",
+                clue: "The paintings watch you with malice. What do they make you feel?",
+                story: "You awake in a cursed gallery, paintings glaring with eyes that follow. Their gaze whispers a riddle to escape.",
+                background: "https://images.pexels.com/photos/2088210/pexels-photo-2088210.jpeg" // Shadowy monster
+            },
+            {
+                code: "BLOOD",
+                clue: "The canvas drips with this substance.",
+                story: "The walls ooze red, a canvas weeping a word that binds the damned.",
+                background: "https://images.pexels.com/photos/1441058/pexels-photo-1441058.jpeg" // Blood and skulls
+            },
+            {
+                code: "GHOST",
+                clue: "The figure in the portrait that moves when you turn away.",
+                story: "A portrait’s figure vanishes, leaving a word etched in frost.",
+                background: "https://images.pexels.com/photos/572708/pexels-photo-572708.jpeg" // Ghostly shapes
+            },
+            {
+                code: "SCREAM",
+                clue: "The sound echoing from the walls.",
+                story: "A scream pierces the silence, its source a word carved into stone.",
+                background: "https://images.pexels.com/photos/3750777/pexels-photo-3750777.jpeg" // Demonic figures
+            },
+            {
+                code: "CURSE",
+                clue: "The spell binding the gallery’s victims.",
+                story: "The air hums with a malevolent spell, its name written in shadows.",
+                background: "https://images.pexels.com/photos/305839/pexels-photo-305839.jpeg" // Cursed ambiance
+            },
+            {
+                code: "DEATH",
+                clue: "The fate of those who fail to escape.",
+                story: "A skeletal hand scrawls a word on the floor, a warning of doom.",
+                background: "https://images.pexels.com/photos/3682157/pexels-photo-3682157.jpeg" // Skulls and bones
+            },
+            {
+                code: "PAINT",
+                clue: "The medium that traps the souls.",
+                story: "Paint cans spill, forming a word that seals the gallery’s curse.",
+                background: "https://images.pexels.com/photos/459038/pexels-photo-459038.jpeg" // Paint with eerie shapes
+            },
+            {
+                code: "EYES",
+                clue: "They watch you from every canvas.",
+                story: "Eyes in the paintings glow, their word burning in the dark.",
+                background: "https://images.pexels.com/photos/167964/pexels-photo-167964.jpeg" // Monster eyes
+            },
+            {
+                code: "VOID",
+                clue: "The darkness behind the torn canvas.",
+                story: "A torn canvas reveals a black abyss, whispering a single word.",
+                background: "https://images.pexels.com/photos/373543/pexels-photo-373543.jpeg" // Dark void with creatures
+            },
+            {
+                code: "SOUL",
+                clue: "What the gallery steals from you.",
+                story: "A mirror reflects no face, only a word etched in blood.",
+                background: "https://images.pexels.com/photos/235985/pexels-photo-235985.jpeg" // Soul-like shadows
+            },
+            {
+                code: "BONE",
+                clue: "The remains scattered on the floor.",
+                story: "Bones crunch underfoot, spelling a word in the dim light.",
+                background: "https://images.pexels.com/photos/1762851/pexels-photo-1762851.jpeg" // Skulls and monsters
+            },
+            {
+                code: "8421",
+                clue: "The final key to skip rooms lies in the monster’s gaze.",
+                story: "Monsters from forgotten games leer, skulls grinning. Enter the final code to skip ahead.",
+                background: "https://images.pexels.com/photos/2088209/pexels-photo-2088209.jpeg" // Monster-heavy with skulls
+            }
+            // Extend to 30 rooms, e.g.:
+            // { code: "HAUNT", clue: "The sound of footsteps behind you.", story: "Footsteps echo, forming a word in the dark.", background: "https://images.pexels.com/photos/235985/pexels-photo-235985.jpeg" }
+        ];
+        let currentRoom = 0;
+        let clueCount = 0;
+        let levelsCompleted = 0;
+        let clueAttempts = 0;
+        let inSpecialRoom = false;
+        let timeLeft = 1200; // 20 minutes in seconds
 
-  <!-- Escape Room Intro -->
-  <div id="intro">
-    <div id="intro-title">CAWT ESCAPE ROOM</div>
-    <div id="intro-loader"></div>
-    <div id="intro-story"></div>
-    <div id="light-dot"></div>
-  </div>
+        const blackScreen = document.getElementById('black-screen');
+        const loadingCircle = document.getElementById('loading-circle');
+        const introVideo = document.getElementById('intro-video');
+        const lock = document.getElementById('lock');
+        const roomDisplay = document.getElementById('room');
+        const clueButton = document.getElementById('clue-button');
+        const clueCountDisplay = document.getElementById('clue-count');
+        const submitButton = document.getElementById('submit-button');
+        const homeButton = document.getElementById('home-button');
+        const codeInput = document.getElementById('code-input');
+        const dialPad = document.getElementById('dial-pad');
+        const message = document.getElementById('message');
+        const roomTitle = document.getElementById('room-title');
+        const storyDisplay = document.getElementById('story');
+        const riddleDisplay = document.getElementById('riddle');
+        const timerDisplay = document.getElementById('timer');
+        const gameContainer = document.getElementById('game-container');
+        const screamSound = document.getElementById('scream-sound');
+        const transitionSound = document.getElementById('transition-sound');
 
-  <!-- Escape Room Game Container -->
-  <div id="game-container">
-    <div id="timer"></div>
-    <div id="clueCounter">🔍 Clues: <span id="clueCount">0</span></div>
-    <div id="story" style="display:none;"></div>
-    <div id="game" class="glitch">
-      <!-- These elements will be updated by JS -->
-      <h2 id="riddleRoomNumber"></h2>
-      <p id="riddleQuestion"></p>
-      <div id="wrongTriesDisplay" style="color: #f00; margin-top: 10px; font-size: 1.1em;"></div>
+        // Set initial background and riddle
+        gameContainer.style.background = `url('${rooms[0].background}') no-repeat center/cover`;
+        riddleDisplay.textContent = rooms[0].clue;
 
-      <div id="inputArea">
-        <input type="text" id="answerInput" placeholder="Type your answer..." autocomplete="off" />
-        <button id="submitBtn">Submit</button>
-        <button id="clueBtn">Get Clue</button>
-        <button id="previousBtn">Previous</button>
-      </div>
-    </div>
-    <div id="wrongDisplay">WRONG</div>
-    <div id="lockIcon">🔓</div>
-    <div id="blood-transition"></div>
-    <div id="message-area"></div>
-  </div>
+        // Disable clue and home buttons initially
+        clueButton.disabled = true;
+        homeButton.style.display = 'none';
 
-  <!-- The Paining Truth Story Container -->
-  <div id="paining-truth-story">
-    <div id="paining-truth-text"></div>
-    <div id="paining-truth-choices"></div>
-  </div>
-
-<script>
-(function() {
-  // --- Configuration ---
-  const config = {
-    // Escape Room Config
-    escapeRoom: {
-      totalRooms: 30,
-      totalTime: 23 * 60, // 23 minutes in seconds
-      wrongTriesAllowed: 3,
-      clueButtonTries: 3,
-      introTypingSpeed: 50, // ms per character
-      storyDisplayTime: 5000, // ms
-      bloodTransitionTime: 2000, // ms
-      jumpScareChance: 0.3,
-      jumpScareImage: 'https://i.imgur.com/OuLE1gK.png'
-    },
-    // Paining Truth Config
-    painingTruth: {
-      typingSpeed: 70, // ms per character for story
-      pauseBetweenScenes: 3000, // ms
-      choiceDisplayDelay: 1000, // ms after text finishes
-    }
-  };
-
-  // --- DOM Element References ---
-  // Home Page
-  const homePage = document.getElementById('home-page');
-  const escapeRoomBtn = document.getElementById('escapeRoomBtn');
-  const painingTruthBtn = document.getElementById('painingTruthBtn');
-
-  // Escape Room Elements
-  const gameContainer = document.getElementById('game-container');
-  const game = document.getElementById('game');
-  const timer = document.getElementById('timer');
-  const wrongDisplay = document.getElementById('wrongDisplay');
-  const answerInput = document.getElementById('answerInput');
-  const clueCountDisplay = document.getElementById('clueCount');
-  const lockIcon = document.getElementById('lockIcon');
-  const inputArea = document.getElementById('inputArea');
-  const clueBtn = document.getElementById('clueBtn');
-  const submitBtn = document.getElementById('submitBtn');
-  const previousBtn = document.getElementById('previousBtn');
-  const storyDiv = document.getElementById('story');
-  const intro = document.getElementById('intro');
-  const introTitle = document.getElementById('intro-title');
-  const introLoader = document.getElementById('intro-loader');
-  const introStory = document.getElementById('intro-story');
-  const lightDot = document.getElementById('light-dot');
-  const bloodTransition = document.getElementById('blood-transition');
-  const messageArea = document.getElementById('message-area');
-
-  // New riddle display elements
-  const riddleRoomNumber = document.getElementById('riddleRoomNumber');
-  const riddleQuestion = document.getElementById('riddleQuestion');
-  const wrongTriesDisplay = document.getElementById('wrongTriesDisplay');
-
-
-  // Paining Truth Elements
-  const painingTruthStoryDiv = document.getElementById('paining-truth-story');
-  const painingTruthText = document.getElementById('paining-truth-text');
-  const painingTruthChoices = document.getElementById('paining-truth-choices');
-
-  // --- Escape Room Game State Variables ---
-  let currentRoom = 0;
-  let timeLeft = config.escapeRoom.totalTime;
-  let clues = 0;
-  let wrongTries = 0;
-  let clueButtonClicksWithoutClues = 0;
-  let storyTimeout = null;
-  let timerInterval = null;
-
-  // --- Paining Truth Story State Variables ---
-  let currentPainingTruthScene = 0;
-  let painingTruthTypingTimeout = null;
-  let painingTruthChoicesDisplayed = false;
-
-  // --- Riddles Data (unchanged) ---
-  const riddles = [
-    { question: "The more you take, the more you leave behind. What am I?", answer: "footprint", clue: "Your steps create me.", story: "The floor creaks beneath your feet in this shadowed chamber, each step leaving a trace that lingers in the dust..." },
-    { question: "I fly without wings, I cry without eyes. Darkness follows me. What am I?", answer: "cloud", clue: "I bring rain and shade.", story: "A cold wind swirls through the room, and above, a form drifts, weeping silently as shadows trail in its wake..." },
-    { question: "I have cities but no houses, forests but no trees, and rivers but no water. What am I?", answer: "map", clue: "I guide without moving.", story: "An ancient parchment lies on a stone table, its faded lines depicting places that exist only in ink..." },
-    { question: "I’m tall when I’m young, and short when I’m old. What am I?", answer: "candle", clue: "I burn to give light.", story: "A flickering flame casts eerie shadows, its waxen form dwindling as it illuminates the cold stone walls..." },
-    { question: "I have branches, but no fruit, trunk, or leaves. What am I?", answer: "bank", clue: "I hold wealth, not plants.", story: "A vaulted chamber echoes with the clink of coins, its walls lined with ledgers of forgotten transactions..." },
-    { question: "What can travel around the world while staying in a corner?", answer: "stamp", clue: "I’m small and sticky.", story: "A tattered envelope lies in the corner, its small square mark whispering of journeys across distant lands..." },
-    { question: "I’m light as a feather, yet the strongest cannot hold me for long. What am I?", answer: "breath", clue: "You need me to live.", story: "The air grows thin in this suffocating room, each gasp a reminder of something fleeting yet vital..." },
-    { question: "What begins with T, ends with T, and has T in it?", answer: "teapot", clue: "I pour a warm drink.", story: "A chipped teapot sits on a dusty table, its spout hinting at long-forgotten gatherings in this forsaken place..." },
-    { question: "I’m always in front of you, but you can never see me. What am I?", answer: "future", clue: "I’m time yet to come.", story: "A clock ticks backward, its hands pointing to moments unseen, as whispers of tomorrow fill the air..." },
-    { question: "What has one eye but cannot see?", answer: "needle", clue: "I pierce fabric.", story: "A glinting needle lies on a tattered cloth, its single eye blind to the threads it binds..." },
-    { question: "The poor have me, the rich need me, and if you eat me, you’ll die. What am I?", answer: "nothing", clue: "I’m the absence of all.", story: "An empty void greets you, a room so bare it feels like the absence itself is watching..." },
-    { question: "What runs all around a house but never moves?", answer: "fence", clue: "I guard the perimeter.", story: "Rusty iron bars encircle the room, standing sentinel, immovable yet ever-present..." },
-    { question: "I’m full of holes, yet I hold water. What am I?", answer: "sponge", clue: "I clean with my pores.", story: "A damp, porous object rests in a puddle, soaking up the room’s secrets with its countless voids..." },
-    { question: "What has a heart that doesn’t beat?", answer: "artichoke", clue: "I’m a vegetable.", story: "A strange plant lies in the corner, its core still and silent, yet named for a living thing..." },
-    { question: "I’m taken from a mine and shut in a wooden case, never released, yet used by many. What am I?", answer: "pencil", clue: "I write without ink.", story: "A worn pencil rolls across a desk, its core of earth trapped forever, leaving marks for all who wield it..." },
-    { question: "What can be broken without being touched?", answer: "promise", clue: "Words create and break me.", story: "Whispers of broken oaths echo in the chamber, their weight heavier than any stone..." },
-    { question: "I’m always running but never move. What am I?", answer: "clock", clue: "I measure time’s passage.", story: "A ticking fills the room, as a clock’s hands chase time endlessly, yet remain fixed in place..." },
-    { question: "What has a mouth but never speaks?", answer: "river", clue: "I flow with water.", story: "A faint gurgle echoes from a carved stone mouth, its silent waters rushing through the dark..." },
-    { question: "I’m seen in water, but I’m not wet. What am I?", answer: "reflection", clue: "I mirror your face.", story: "A still pool in the floor shows your face, a perfect image untouched by the water’s chill..." },
-    { question: "What has four legs in the morning, two at noon, and three in the evening?", answer: "human", clue: "I’m you, through life.", story: "A shadow moves across the wall, its form shifting with the stages of a life’s journey..." },
-    { question: "I’m weightless, but you can see me. Put me in a bucket, and I’ll make it lighter. What am I?", answer: "hole", clue: "I’m an absence you see.", story: "A gaping void in the floor stares back, lightening all that holds it, yet visible to all..." },
-    { question: "What speaks without a mouth and hears without ears?", answer: "echo", clue: "I repeat what you say.", story: "Your voice bounces off the walls, a ghostly reply mimicking your words from the shadows..." },
-    { question: "If two’s company and three’s a crowd, what are four and five?", answer: "nine", clue: "Add them together.", story: "Numbers glow faintly on the wall, their sum forming a key to the next chamber..." },
-    { question: "What is so fragile that saying its name breaks it?", answer: "silence", clue: "Quiet is my essence.", story: "The room is deathly still, but a single sound shatters the fragile peace within..." },
-    { question: "I’m not alive, but I grow; I don’t have lungs, but I need air. What am I?", answer: "fire", clue: "I consume to exist.", story: "A faint ember glows in the hearth, hungry for air, growing with each breath it steals..." },
-    { question: "What has a thumb but no fingers?", answer: "glove", clue: "I cover your hand.", story: "A tattered glove lies discarded, its thumb empty, waiting for a hand to fill it..." },
-    { question: "I’m where the earth and sky appear to meet, yet you can never reach me. What am I?", answer: "horizon", clue: "I’m always distant.", story: "A window shows a line where earth and sky converge, forever out of reach, taunting your escape..." },
-    { question: "What can you catch but not throw?", answer: "cold", clue: "It’s an illness.", story: "A chill seeps into your bones, an invisible affliction caught in the damp air of this cursed room..." },
-    { question: "I’m born of incantation, sustained by attention, and die when ignored. What am I?", answer: "spell", clue: "Magic gives me life.", story: "Runes glow faintly on the walls, their power fading unless your focus keeps them alive..." },
-    { question: "What is the next letter in this sequence: J, K, I, M, I, ?, I?", answer: "I", clue: "Look for a pattern in letters.", story: "Carved letters spiral across the ceiling, their sequence a puzzle locking the door ahead..." }
-  ];
-
-  // --- Paining Truth Story Data ---
-  const painingTruthScenes = [
-    {
-      text: "The bell screamed, but no one heard you. Not the teacher, whose eyes skipped over your raised hand like a stone over water. Not your classmates, whose laughter filled the room, leaving no space for your quiet voice. Another morning, another lesson in being invisible. The chalk dust settled, a fine layer over everything, even your hopes.",
-      choices: [
-        { text: "Lower your hand, shrink into your seat, let the silence consume you.", nextScene: 1, type: "sad" },
-        { text: "Try again, a silent plea for recognition, a desperate flicker of courage.", nextScene: 2, type: "wise" }
-      ]
-    },
-    {
-      text: "You pulled your hand back, a defeated sigh escaping your lips, unheard. The lesson continued, a blur of numbers and words that held no meaning for you. Your world had shrunk to the space beneath your desk, a small, dark haven where no one could see the tremor in your hands. The weight of being overlooked pressed down, heavy as a tombstone.",
-      choices: [
-        { text: "Doodle in your notebook, drawing a world where you mattered.", nextScene: 3, type: "wise" },
-        { text: "Stare out the window, wishing you could fly away, anywhere but here.", nextScene: 4, type: "sad" }
-      ]
-    },
-    {
-      text: "Your fingers trembled as you pushed your hand higher, a fragile flag of hope. The teacher paused, her gaze briefly flickered, then moved on. The air crackled with unspoken words, a silent rejection that echoed louder than any shout. The courage you mustered dissolved, leaving behind a bitter taste.",
-      choices: [
-        { text: "Force a smile, pretending it didn't sting, a mask for the world.", nextScene: 3, type: "sad" },
-        { text: "Blink back tears, the burning behind your eyes a secret only you knew.", nextScene: 4, type: "wise" }
-      ]
-    },
-    {
-      text: "The cafeteria buzzed with laughter, none of it for you. Groups huddled together, a vibrant tapestry of friendship you could only observe from the fringes. Your lunchbox felt heavy, filled not with food, but with the crushing weight of loneliness. Every bite was tasteless, a hollow echo in the vast, noisy room.",
-      choices: [
-        { text: "Find a quiet corner, a small refuge from the noise, where silence was your only companion.", nextScene: 5, type: "wise" },
-        { text: "Walk past the tables, hoping someone would call your name, knowing they wouldn't.", nextScene: 6, type: "sad" }
-      ]
-    },
-    {
-      text: "The scolding came swift and sharp, a cold blade piercing the fragile peace you tried to build. 'Alex, why aren't you paying attention?' Her voice, usually soft, was laced with disappointment. You knew it wasn't fair, you knew you hadn't done anything, but the words caught in your throat, a silent scream trapped within. No one spoke up, no one defended you. The injustice settled deep in your bones.",
-      choices: [
-        { text: "Bite your lip, let the accusation burn, accepting the unfairness.", nextScene: 7, type: "sad" },
-        { text: "Whisper a defense, a fragile attempt to clear your name, knowing it might fall on deaf ears.", nextScene: 8, type: "wise" }
-      ]
-    },
-    {
-      text: "The whispers found you, sharp fragments of their laughter, cutting through the thin veil of your composure. 'Did you see Alex today? So weird.' 'Yeah, always alone.' Each word was a tiny sting, accumulating into a dull ache in your chest. They didn't even try to hide it, their casual cruelty a testament to your insignificance.",
-      choices: [
-        { text: "Run, let the tears blur the world, seeking refuge in solitude.", nextScene: 9, type: "sad" },
-        { text: "Face them, a silent challenge in your eyes, a desperate plea for understanding.", nextScene: 10, type: "wise" }
-      ]
-    },
-    {
-      text: "The door closed behind you, but the silence inside was louder than any storm. Your parents were busy, their faces illuminated by screens, their voices distant. 'How was school, honey?' they'd ask, not really listening for an answer. The house, once a sanctuary, now felt like another room where you were just a shadow, unseen, unheard. The warmth you craved was just out of reach.",
-      choices: [
-        { text: "Retreat to your room, a fortress of solitude, where your pain could be your own.", nextScene: 11, type: "sad" },
-        { text: "Try to share a small part of your day, a fragile bridge, hoping they'd notice the cracks in your voice.", nextScene: 12, type: "wise" }
-      ]
-    },
-    {
-      text: "Only on paper could you truly exist. The pencil moved, a silent extension of your soul, sketching worlds where you were strong, loved, visible. Colors bled onto the page, vibrant hues that mirrored the emotions swirling within you, emotions you couldn't express with words. This was your secret garden, a place where the pain could transform into something beautiful, something real.",
-      choices: [
-        { text: "Hide the drawing, a secret world for your eyes only, protecting its fragile beauty.", nextScene: 13, type: "sad" },
-        { text: "Leave it somewhere, a silent message to the world, a desperate hope for discovery.", nextScene: 14, type: "wise" }
-      ]
-    },
-    {
-      text: "A tiny spark, in a world of grey. The old janitor, Mr. Henderson, paused by your desk. 'That's a fine drawing, son,' he rumbled, his voice surprisingly gentle. He didn't ask about your grades or your friends. He just saw the art, and for a fleeting moment, he saw you. It was a small, unexpected kindness, a flicker of light in the overwhelming darkness.",
-      choices: [
-        { text: "Dismiss it, a fleeting illusion, too fragile to hold onto.", nextScene: 15, type: "sad" },
-        { text: "Hold onto it, a fragile hope, a warmth in the cold silence.", nextScene: 16, type: "wise" }
-      ]
-    },
-    {
-      text: "The night was long, but dawn promised another day of the same. The weight of tomorrow pressed down, a familiar burden. You closed your eyes, but sleep offered no escape, only a replay of the day's slights. The world outside was bright, but your heart felt like a perpetual twilight, waiting for a sunrise that might never come. Yet, a tiny ember of defiance glowed within you, a silent promise to yourself.",
-      choices: [
-        { text: "Curl into a ball, letting the darkness embrace you, a silent surrender.", nextScene: 17, type: "sad" },
-        { text: "Stare at the ceiling, planning small acts of quiet rebellion, a whisper of hope.", nextScene: 18, type: "wise" }
-      ]
-    },
-    {
-      text: "The final bell rang, a deafening clang that signaled the end of another day. You walked home, the weight of unspoken words heavy on your shoulders. The world moved around you, a vibrant blur you weren't a part of. But as you stepped through your front door, a thought solidified: this pain, this truth, it was yours. And perhaps, in acknowledging it, you had found a strength no one else could see. The journey was far from over, but for the first time, you felt a faint, quiet resolve. The story ends, but your truth continues.",
-      choices: [] // End of story
-    }
-  ];
-
-  // --- Utility Functions ---
-  function showElement(element) { element.style.display = 'block'; }
-  function hideElement(element) { element.style.display = 'none'; }
-  function showFlex(element) { element.style.display = 'flex'; }
-
-  function showMessage(text, type = 'clue') {
-    messageArea.textContent = text;
-    messageArea.style.color = type === 'clue' ? 'yellow' : 'red';
-    messageArea.style.borderColor = type === 'clue' ? 'yellow' : 'red';
-    showElement(messageArea);
-    setTimeout(() => {
-      hideElement(messageArea);
-    }, 3000);
-  }
-
-  // --- Home Page Logic ---
-  function showHomePage() {
-    hideElement(gameContainer);
-    hideElement(painingTruthStoryDiv);
-    hideElement(intro); // Ensure intro is hidden if coming back from game
-    showFlex(homePage);
-  }
-
-  escapeRoomBtn.addEventListener('click', () => {
-    hideElement(homePage);
-    startEscapeRoomIntro();
-  });
-
-  painingTruthBtn.addEventListener('click', () => {
-    hideElement(homePage);
-    startPainingTruthStory();
-  });
-
-  // --- Escape Room Game Functions ---
-
-  function startEscapeRoomIntro() {
-    // Hide all game elements initially
-    [game, timer, clueCounter, storyDiv].forEach(hideElement);
-    showFlex(intro);
-    showElement(introTitle);
-
-    setTimeout(() => {
-      hideElement(introTitle);
-      showElement(introLoader);
-      setTimeout(() => {
-        hideElement(introLoader);
-        showElement(introStory);
-        const narrative = "You wandered too far into the abandoned manor, lured by whispers of forgotten secrets. A cold wind slammed the door shut behind you, and the walls pulsed with an eerie glow. Trapped in a maze of riddles, your only escape is to solve the mysteries within... or remain forever in the shadows.";
-        let i = 0;
-        function typeWriter() {
-          if (i < narrative.length) {
-            introStory.textContent += narrative.charAt(i);
-            i++;
-            setTimeout(typeWriter, config.escapeRoom.introTypingSpeed);
-          } else {
-            introStory.style.animation = 'shake 0.1s infinite';
-          }
+        // Timer logic
+        function updateTimer() {
+            if (timeLeft <= 0) {
+                endGame();
+                return;
+            }
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            if (timeLeft <= 10) {
+                roomDisplay.classList.add('glitch-page', 'dim');
+                timerDisplay.style.opacity = 1; // Keep timer visible
+            }
+            setTimeout(updateTimer, 1000);
         }
-        typeWriter();
-        setTimeout(() => {
-          hideElement(introStory);
-          showElement(lightDot);
-          lightDot.style.animation = 'light-spread 5s ease-in forwards';
-          setTimeout(() => {
-            hideElement(intro);
-            showFlex(gameContainer); // Show the game container
-            // Show necessary game elements
-            [game, timer, clueCounter, inputArea].forEach(showElement);
-            timerInterval = setInterval(updateTimer, 1000);
-            displayEscapeRoom();
-          }, 5000);
-        }, narrative.length * config.escapeRoom.introTypingSpeed + 2000); // Wait for typing + a bit more
-      }, 5000);
-    }, 5000);
-  }
 
-  function updateTimer() {
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      game.innerHTML = `<h1>💀 Time's Up! The shadows claim you.</h1>`;
-      hideElement(inputArea);
-      hideElement(storyDiv);
-      timer.textContent = ''; // Clear timer
-      return;
-    }
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
-    // Combine room number with timer
-    timer.textContent = `⏱️ Room ${currentRoom + 1} | Time Left: ${minutes}m ${seconds}s`;
-    if (timeLeft <= 60) {
-      timer.style.color = '#f00';
-    }
-    timeLeft--;
-  }
+        // Start game with fade-out and video
+        window.onload = () => {
+            roomDisplay.classList.add('fade-out');
+            storyDisplay.textContent = rooms[0].story;
+            setTimeout(() => {
+                blackScreen.style.display = 'block';
+                blackScreen.classList.add('fade-in', 'flicker');
+                transitionSound.play().catch(() => {});
+                setTimeout(() => {
+                    introVideo.style.display = 'block';
+                    setTimeout(() => {
+                        proceedToGame();
+                    }, 10000); // Play YouTube video for 10 seconds
+                }, 1000);
+            }, 1000);
+            updateTimer();
+        };
 
-  function showWrongEffect() {
-    showElement(wrongDisplay);
-    document.body.style.backgroundColor = '#300';
-    setTimeout(() => {
-      hideElement(wrongDisplay);
-      document.body.style.backgroundColor = '#111';
-    }, 1500);
-  }
-
-  function showInputError() {
-    answerInput.classList.add('input-error');
-    setTimeout(() => answerInput.classList.remove('input-error'), 3000);
-  }
-
-  function showLock() {
-    showElement(lockIcon);
-    setTimeout(() => {
-      hideElement(lockIcon);
-    }, 1500);
-  }
-
-  function showJumpScare() {
-    const jump = document.createElement('div');
-    jump.style.position = 'fixed';
-    jump.style.top = '0';
-    jump.style.left = '0';
-    jump.style.right = '0';
-    jump.style.bottom = '0';
-    jump.style.background = `url(${config.escapeRoom.jumpScareImage}) center center / cover no-repeat`;
-    jump.style.zIndex = '9999';
-    jump.style.animation = 'glitch 0.5s infinite';
-    document.body.appendChild(jump);
-    setTimeout(() => {
-      document.body.removeChild(jump);
-    }, 1000);
-  }
-
-  function showBloodTransition(callback) {
-    showElement(bloodTransition);
-    bloodTransition.style.animation = 'blood-flow 2s ease-in-out';
-    setTimeout(() => {
-      hideElement(bloodTransition);
-      bloodTransition.style.animation = '';
-      callback();
-    }, config.escapeRoom.bloodTransitionTime);
-  }
-
-  function showStoryThenRiddle() {
-    clueBtn.disabled = true;
-    previousBtn.disabled = true;
-    hideElement(game); // Hide the main game div during story display
-
-    const riddle = riddles[currentRoom];
-    showElement(storyDiv);
-    storyDiv.textContent = riddle.story;
-
-    if (storyTimeout) clearTimeout(storyTimeout);
-    storyTimeout = setTimeout(() => {
-      hideElement(storyDiv);
-      showElement(game); // Show the main game div after story
-      clueBtn.disabled = false;
-      previousBtn.disabled = currentRoom === 0;
-      displayRiddle();
-    }, config.escapeRoom.storyDisplayTime);
-  }
-
-  function displayRiddle() {
-    const riddle = riddles[currentRoom];
-
-    // Update the existing riddle display elements
-    riddleRoomNumber.textContent = `Room ${currentRoom + 1}`;
-    riddleQuestion.textContent = riddle.question;
-    wrongTriesDisplay.textContent = `Wrong Tries: ${wrongTries}/${config.escapeRoom.wrongTriesAllowed}`;
-
-    showFlex(inputArea); // Ensure input area is always flex
-    answerInput.value = '';
-    answerInput.focus();
-    updateTimer(); // Update timer immediately to reflect new room number
-  }
-
-  function displayEscapeRoom() {
-    if (timeLeft <= 0) return;
-    if (currentRoom >= config.escapeRoom.totalRooms) {
-      game.innerHTML = `<h1>🎉 You escaped all ${config.escapeRoom.totalRooms} rooms!</h1><p>Time Left: ${Math.floor(timeLeft / 60)}m ${timeLeft % 60}s</p>`;
-      hideElement(inputArea);
-      hideElement(storyDiv);
-      clearInterval(timerInterval);
-      return;
-    }
-    showBloodTransition(showStoryThenRiddle);
-  }
-
-  function checkAnswer(input) {
-    if (timeLeft <= 0) return;
-    const answer = input.trim().toLowerCase();
-    const correct = riddles[currentRoom].answer.toLowerCase();
-
-    if (!answer) {
-      showInputError();
-      return;
-    }
-
-    if (answer === correct) {
-      wrongTries = 0;
-      currentRoom++;
-      if (currentRoom % 2 === 0) clues++;
-      clueCountDisplay.textContent = clues;
-      showLock();
-      displayEscapeRoom();
-    } else {
-      wrongTries++;
-      if (wrongTries >= config.escapeRoom.wrongTriesAllowed) {
-        showMessage(`🤫 Hint: ${riddles[currentRoom].clue}`, 'clue'); // Changed to clue
-        wrongTries = 0; // Reset wrong tries after hint
-      } else {
-        showWrongEffect();
-        if (Math.random() < config.escapeRoom.jumpScareChance) {
-          showJumpScare();
+        // Proceed to game after video
+        function proceedToGame() {
+            introVideo.style.display = 'none';
+            blackScreen.classList.add('fade-out');
+            setTimeout(() => {
+                blackScreen.style.display = 'none';
+                blackScreen.classList.remove('flicker');
+                roomDisplay.classList.remove('fade-out');
+                roomDisplay.classList.add('fade-in');
+                message.textContent = '';
+            }, 1000);
         }
-      }
-      displayRiddle(); // Re-display riddle to update wrong tries count
-      showInputError();
-    }
-  }
 
-  function goToPreviousRoom() {
-    if (timeLeft <= 0) return;
-    if (currentRoom > 0) {
-      currentRoom--;
-      showBloodTransition(showStoryThenRiddle);
-    }
-  }
+        // End game sequence
+        function endGame() {
+            roomDisplay.style.display = 'none';
+            timerDisplay.style.display = 'none';
+            blackScreen.style.display = 'block';
+            blackScreen.classList.add('fade-in');
+            loadingCircle.style.display = 'block';
+            setTimeout(() => {
+                loadingCircle.style.display = 'none';
+                message.textContent = "YOU LOST";
+                message.classList.add('wrong', 'game-over');
+                message.style.display = 'block';
+                setTimeout(() => {
+                    message.textContent = "GAME OVER";
+                    message.classList.add('scary-end');
+                    screamSound.play().catch(() => {});
+                }, 3000);
+            }, 4000);
+        }
 
-  function getClue() {
-    if (timeLeft <= 0) return;
-    if (clues > 0) {
-      clues--;
-      clueCountDisplay.textContent = clues;
-      clueButtonClicksWithoutClues = 0;
-      showMessage(`🕯 Clue: ${riddles[currentRoom].clue}`, 'clue');
-    } else {
-      clueButtonClicksWithoutClues++;
-      if (clueButtonClicksWithoutClues >= config.escapeRoom.clueButtonTries) {
-        showMessage(`💡 Answer: ${riddles[currentRoom].answer}`, 'clue');
-        clueButtonClicksWithoutClues = 0;
-      } else {
-        showMessage(`❌ You have no clues left! Press again ${config.escapeRoom.clueButtonTries - clueButtonClicksWithoutClues} time(s) to reveal the answer.`, 'error');
-      }
-    }
-  }
+        // Handle clue button
+        clueButton.addEventListener('click', () => {
+            clueAttempts++;
+            if (levelsCompleted >= 2 && clueCount < 1) {
+                clueCount++;
+                clueCountDisplay.textContent = clueCount;
+                message.textContent = rooms[currentRoom].clue;
+            } else {
+                clueButton.classList.add('glitch-red');
+                screamSound.play().catch(() => {});
+                message.textContent = levelsCompleted < 2 ? "Complete two levels to unlock a clue!" : "No more clues available!";
+                setTimeout(() => {
+                    clueButton.classList.remove('glitch-red');
+                }, 1000);
+            }
+        });
 
-  // --- Paining Truth Story Functions ---
+        // Handle home button
+        homeButton.addEventListener('click', () => {
+            currentRoom = 0;
+            inSpecialRoom = false;
+            roomTitle.textContent = `Room 1`;
+            storyDisplay.textContent = rooms[0].story;
+            riddleDisplay.textContent = rooms[0].clue;
+            gameContainer.style.background = `url('${rooms[0].background}') no-repeat center/cover`;
+            codeInput.value = '';
+            codeInput.style.display = 'inline-block';
+            dialPad.style.display = 'none';
+            message.textContent = '';
+            homeButton.style.display = 'none';
+            submitButton.style.display = 'inline-block';
+            clueButton.style.display = 'inline-block';
+            roomDisplay.classList.add('fade-in');
+        });
 
-  function startPainingTruthStory() {
-    // Hide all other game elements
-    hideElement(homePage);
-    hideElement(gameContainer);
-    hideElement(intro);
-    showFlex(painingTruthStoryDiv);
-    painingTruthText.textContent = '';
-    painingTruthChoices.innerHTML = '';
-    currentPainingTruthScene = 0;
-    displayPainingTruthScene();
-  }
+        // Handle dial pad buttons
+        document.querySelectorAll('.dial-button').forEach(button => {
+            button.addEventListener('click', () => {
+                codeInput.value += button.getAttribute('data-value');
+            });
+        });
 
-  function typeWriterPainingTruth(text, callback) {
-    painingTruthText.textContent = '';
-    let i = 0;
-    if (painingTruthTypingTimeout) clearTimeout(painingTruthTypingTimeout);
+        // Handle code submission
+        submitButton.addEventListener('click', () => {
+            const input = codeInput.value.trim().toUpperCase();
+            if (inSpecialRoom) {
+                if (input === rooms[rooms.length - 1].code) {
+                    transitionToRoom(6); // Skip to Room 7 (skipping 5 rooms: 2-6)
+                } else {
+                    message.textContent = "WRONG";
+                    message.classList.add('wrong');
+                    screamSound.play().catch(() => {});
+                    homeButton.style.display = 'inline-block';
+                    setTimeout(() => {
+                        transitionToRoom(1); // Auto-advance to Room 2
+                    }, 3000);
+                }
+            } else if (currentRoom === 0) {
+                if (input === rooms[0].code) {
+                    transitionToRoom(1); // Correct riddle, go to Room 2
+                } else if (input === '9904') {
+                    inSpecialRoom = true;
+                    roomTitle.textContent = "Cursed Chamber";
+                    storyDisplay.textContent = rooms[rooms.length - 1].story;
+                    riddleDisplay.textContent = rooms[rooms.length - 1].clue;
+                    gameContainer.style.background = `url('${rooms[rooms.length - 1].background}') no-repeat center/cover`;
+                    codeInput.value = '';
+                    codeInput.style.display = 'none';
+                    dialPad.style.display = 'grid';
+                    message.textContent = "Enter the final code using the dial pad.";
+                    roomDisplay.classList.add('fade-in');
+                } else {
+                    message.textContent = "WRONG";
+                    message.classList.add('wrong');
+                    screamSound.play().catch(() => {});
+                    homeButton.style.display = 'inline-block';
+                    setTimeout(() => {
+                        transitionToRoom(1); // Auto-advance to Room 2
+                    }, 3000);
+                }
+            } else if (input === rooms[currentRoom].code) {
+                levelsCompleted++;
+                if (levelsCompleted >= 2) clueButton.disabled = false;
+                message.textContent = "Correct! The lock opens.";
+                transitionToNextRoom();
+            } else {
+                message.textContent = "WRONG";
+                message.classList.add('wrong');
+                screamSound.play().catch(() => {});
+                setTimeout(() => {
+                    message.classList.remove('wrong');
+                    message.textContent = '';
+                    codeInput.value = '';
+                }, 3000);
+            }
+        });
 
-    function type() {
-      if (i < text.length) {
-        painingTruthText.textContent += text.charAt(i);
-        i++;
-        painingTruthTypingTimeout = setTimeout(type, config.painingTruth.typingSpeed);
-      } else {
-        if (callback) callback();
-      }
-    }
-    type();
-  }
+        // Transition to next room
+        function transitionToNextRoom() {
+            roomDisplay.classList.add('fade-out');
+            transitionSound.play().catch(() => {});
+            setTimeout(() => {
+                blackScreen.style.display = 'block';
+                blackScreen.classList.add('fade-in', 'flicker');
+                setTimeout(() => {
+                    lock.style.display = 'block';
+                    lock.classList.add('glitch');
+                    setTimeout(() => {
+                        lock.style.display = 'none';
+                        lock.classList.remove('glitch');
+                        currentRoom++;
+                        if (currentRoom < rooms.length - 1) {
+                            roomTitle.textContent = `Room ${currentRoom + 1}`;
+                            storyDisplay.textContent = rooms[currentRoom].story;
+                            riddleDisplay.textContent = rooms[currentRoom].clue;
+                            gameContainer.style.background = `url('${rooms[currentRoom].background}') no-repeat center/cover`;
+                            codeInput.value = '';
+                            message.textContent = '';
+                            codeInput.style.display = 'inline-block';
+                            dialPad.style.display = 'none';
+                            blackScreen.classList.add('fade-out');
+                            setTimeout(() => {
+                                blackScreen.style.display = 'none';
+                                blackScreen.classList.remove('flicker');
+                                roomDisplay.classList.remove('fade-out');
+                                roomDisplay.classList.add('fade-in');
+                            }, 1000);
+                        } else {
+                            storyDisplay.textContent = "You escaped... but the gallery's curse lingers in your soul.";
+                            riddleDisplay.textContent = "";
+                            roomTitle.textContent = "Escape Complete";
+                            message.textContent = "Congratulations! You survived!";
+                            gameContainer.style.background = `url('https://images.pexels.com/photos/1762851/pexels-photo-1762851.jpeg') no-repeat center/cover`;
+                            codeInput.style.display = 'none';
+                            submitButton.style.display = 'none';
+                            clueButton.style.display = 'none';
+                            roomDisplay.classList.remove('fade-out');
+                            roomDisplay.classList.add('fade-in');
+                            blackScreen.style.display = 'none';
+                            blackScreen.classList.remove('flicker');
+                        }
+                    }, 2000); // Glitch lock for 2 seconds
+                }, 1000);
+            }, 1000);
+        }
 
-  function displayPainingTruthScene() {
-    painingTruthChoices.innerHTML = ''; // Clear previous choices
-    painingTruthChoicesDisplayed = false; // Reset flag
-
-    if (currentPainingTruthScene >= painingTruthScenes.length) {
-      // End of story
-      typeWriterPainingTruth("The story concludes, but the echoes of truth linger. Thank you for walking with Alex.", () => {
-        setTimeout(showHomePage, 5000); // Go back to home page after a delay
-      });
-      return;
-    }
-
-    const scene = painingTruthScenes[currentPainingTruthScene];
-    typeWriterPainingTruth(scene.text, () => {
-      // After typing, display choices if available
-      if (scene.choices && scene.choices.length > 0) {
-        setTimeout(() => {
-          scene.choices.forEach((choice, index) => {
-            const button = document.createElement('button');
-            button.textContent = choice.text;
-            button.className = 'choice'; // Reuse choice button style
-            button.addEventListener('click', () => handlePainingTruthChoice(choice.nextScene));
-            painingTruthChoices.appendChild(button);
-          });
-          painingTruthChoicesDisplayed = true;
-        }, config.painingTruth.choiceDisplayDelay);
-      } else {
-        // If no choices, it's the end of a path or the story itself.
-        // Automatically advance to the next scene after a pause.
-        setTimeout(() => {
-          currentPainingTruthScene++;
-          displayPainingTruthScene();
-        }, config.painingTruth.pauseBetweenScenes);
-      }
-    });
-  }
-
-  function handlePainingTruthChoice(nextSceneIndex) {
-    if (!painingTruthChoicesDisplayed) return; // Prevent double clicks or clicks before choices appear
-
-    // Clear choices immediately
-    painingTruthChoices.innerHTML = '';
-    painingTruthChoicesDisplayed = false;
-
-    // Advance to the chosen scene
-    currentPainingTruthScene = nextSceneIndex;
-    setTimeout(displayPainingTruthScene, config.painingTruth.pauseBetweenScenes); // Pause before next scene
-  }
-
-  // --- Initial Game Start ---
-  showHomePage(); // Start by showing the home page
-})();
-</script>
+        // Transition to specific room
+        function transitionToRoom(roomIndex) {
+            roomDisplay.classList.add('fade-out');
+            transitionSound.play().catch(() => {});
+            setTimeout(() => {
+                blackScreen.style.display = 'block';
+                blackScreen.classList.add('fade-in', 'flicker');
+                setTimeout(() => {
+                    lock.style.display = 'block';
+                    lock.classList.add('glitch');
+                    setTimeout(() => {
+                        lock.style.display = 'none';
+                        lock.classList.remove('glitch');
+                        currentRoom = roomIndex;
+                        inSpecialRoom = false;
+                        roomTitle.textContent = `Room ${currentRoom + 1}`;
+                        storyDisplay.textContent = rooms[currentRoom].story;
+                        riddleDisplay.textContent = rooms[currentRoom].clue;
+                        gameContainer.style.background = `url('${rooms[currentRoom].background}') no-repeat center/cover`;
+                        codeInput.value = '';
+                        message.textContent = '';
+                        codeInput.style.display = 'inline-block';
+                        dialPad.style.display = 'none';
+                        homeButton.style.display = 'none';
+                        blackScreen.classList.add('fade-out');
+                        setTimeout(() => {
+                            blackScreen.style.display = 'none';
+                            blackScreen.classList.remove('flicker');
+                            roomDisplay.classList.remove('fade-out');
+                            roomDisplay.classList.add('fade-in');
+                        }, 1000);
+                    }, 2000);
+                }, 1000);
+            }, 1000);
+        }
+    </script>
 </body>
 </html>
