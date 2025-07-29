@@ -1,712 +1,692 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAWT Escape Room: The Painting Truth</title>
-    <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            font-family: 'Times New Roman', Times, serif;
-            background: #000000;
-            color: #999999;
-        }
-        #game-container {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #000000;
-            transition: background 1s ease;
-        }
-        #intro-video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none;
-            z-index: 10;
-        }
-        #black-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000000;
-            opacity: 0;
-            z-index: 11;
-            pointer-events: none;
-        }
-        #loading-circle {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
-            border: 5px solid #999999;
-            border-top: 5px solid transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            display: none;
-            z-index: 12;
-        }
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-        #lock {
-            position: absolute;
-            font-size: 120px;
-            color: #999999;
-            text-shadow: 0 0 10px #ff0000;
-            z-index: 15;
-            display: none;
-        }
-        .glitch {
-            animation: glitch 0.3s infinite alternate;
-        }
-        .glitch-text {
-            animation: glitch-text 0.2s infinite alternate;
-        }
-        .twitch {
-            animation: twitch 0.3s infinite alternate;
-        }
-        .glitch-page {
-            animation: glitch-page 0.2s infinite alternate;
-        }
-        @keyframes glitch {
-            0% { transform: translate(0, 0); opacity: 1; }
-            20% { transform: translate(5px, -5px); opacity: 0.7; }
-            40% { transform: translate(-5px, 5px); opacity: 0.5; }
-            60% { transform: translate(3px, 3px); opacity: 0.8; }
-            80% { transform: translate(-3px, -3px); opacity: 0.6; }
-            100% { transform: translate(0, 0); opacity: 1; }
-        }
-        @keyframes glitch-text {
-            0% { transform: skew(0deg); opacity: 1; color: #999999; }
-            20% { transform: skew(5deg); opacity: 0.8; color: #cc00cc; }
-            40% { transform: skew(-5deg); opacity: 0.6; color: #999999; }
-            60% { transform: skew(3deg); opacity: 0.9; color: #cc00cc; }
-            80% { transform: skew(-3deg); opacity: 0.7; color: #999999; }
-            100% { transform: skew(0deg); opacity: 1; color: #999999; }
-        }
-        @keyframes twitch {
-            0% { transform: translate(0, 0); }
-            20% { transform: translate(3px, -3px); }
-            40% { transform: translate(-3px, 3px); }
-            60% { transform: translate(2px, -2px); }
-            80% { transform: translate(-2px, 2px); }
-            100% { transform: translate(0, 0); }
-        }
-        @keyframes glitch-page {
-            0% { transform: translate(0, 0); }
-            20% { transform: translate(5px, -5px); }
-            40% { transform: translate(-5px, 5px); }
-            60% { transform: translate(3px, 3px); }
-            80% { transform: translate(-3px, -3px); }
-            100% { transform: translate(0, 0); }
-        }
-        .fade-out {
-            animation: fadeOut 1s forwards;
-        }
-        .fade-in {
-            animation: fadeIn 1s forwards;
-        }
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .dim {
-            animation: dim 10s linear forwards;
-        }
-        @keyframes dim {
-            from { opacity: 1; }
-            to { opacity: 0.1; }
-        }
-        .scary-end {
-            animation: scary-end 2s infinite alternate;
-        }
-        @keyframes scary-end {
-            0% { transform: scale(1); opacity: 1; color: #999999; }
-            20% { transform: scale(1.1) skew(5deg); opacity: 0.7; color: #cc00cc; }
-            40% { transform: scale(0.9) skew(-5deg); opacity: 0.5; color: #999999; }
-            60% { transform: scale(1.05) skew(3deg); opacity: 0.8; color: #cc00cc; }
-            80% { transform: scale(0.95) skew(-3deg); opacity: 0.6; color: #999999; }
-            100% { transform: scale(1); opacity: 1; color: #999999; }
-        }
-        #room {
-            text-align: center;
-            max-width: 80%;
-        }
-        #story {
-            font-size: 28px;
-            text-shadow: 0 0 5px #ffffff;
-            margin-bottom: 20px;
-            white-space: pre-wrap;
-            overflow: hidden;
-            border-right: 2px solid #ffffff;
-            animation: typing 5s steps(40, end), blink-caret 0.75s step-end infinite, glitch-text 0.2s infinite alternate;
-        }
-        #riddle {
-            font-size: 24px;
-            text-shadow: 0 0 5px #ffffff;
-            margin-bottom: 20px;
-            white-space: pre-wrap;
-            overflow: hidden;
-            border-right: 2px solid #ffffff;
-            animation: typing 5s steps(40, end), blink-caret 0.75s step-end infinite, glitch-text 0.2s infinite alternate;
-        }
-        @keyframes typing {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-        @keyframes blink-caret {
-            from, to { border-color: transparent; }
-            50% { border-color: #ffffff; }
-        }
-        #clue-bar {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: #000000;
-            padding: 10px;
-            border: 2px solid #333333;
-            border-radius: 5px;
-        }
-        #timer {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24px;
-            color: #999999;
-            text-shadow: 0 0 10px #ff0000;
-            font-family: 'Creepster', cursive;
-        }
-        #clue-button, #submit-button, #home-button {
-            padding: 10px 20px;
-            margin: 5px;
-            cursor: pointer;
-            background: #000000;
-            border: 2px solid #333333;
-            color: #999999;
-            border-radius: 5px;
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 24px;
-            text-shadow: 0 0 5px #ffffff;
-        }
-        #clue-button:hover, #submit-button:hover, #home-button:hover {
-            background: #666666;
-        }
-        #clue-button.glitch-red {
-            background: #ff0000;
-            animation: glitch 0.3s infinite alternate;
-        }
-        #home-button {
-            display: none;
-        }
-        #code-input {
-            padding: 10px;
-            margin: 10px;
-            font-size: 24px;
-            background: #000000;
-            color: #999999;
-            border: 2px solid #333333;
-            border-radius: 5px;
-            font-family: 'Times New Roman', Times, serif;
-            text-shadow: 0 0 5px #ffffff;
-        }
-        #dial-pad {
-            display: none;
-            grid-template-columns: repeat(3, 60px);
-            gap: 10px;
-            margin: 20px auto;
-        }
-        .dial-button {
-            width: 60px;
-            height: 60px;
-            background: #000000;
-            border: 2px solid #333333;
-            color: #999999;
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 24px;
-            cursor: pointer;
-            border-radius: 5px;
-            text-align: center;
-            line-height: 60px;
-            text-shadow: 0 0 5px #ffffff;
-        }
-        .dial-button:hover {
-            background: #666666;
-        }
-        #message {
-            margin-top: 10px;
-            font-size: 36px;
-            text-shadow: 0 0 5px #ffffff;
-            display: none;
-            font-family: 'Times New Roman', Times, serif;
-            animation: glitch-text 0.2s infinite alternate, twitch 0.3s infinite alternate;
-        }
-        #message.wrong {
-            display: block;
-        }
-        #message.game-over {
-            font-size: 48px;
-            color: #999999;
-            text-shadow: 0 0 10px #ff0000;
-            animation: scary-end 2s infinite alternate;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAWT Escape Room: The Painting Truth</title>
+<link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+<style>
+body, html {
+margin: 0;
+padding: 0;
+overflow: hidden;
+font-family: 'Times New Roman', Times, serif;
+background: #000000;
+color: #999999;
+}
+#game-container {
+width: 100vw;
+height: 100vh;
+position: relative;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+background: #000000;
+transition: background 1s ease;
+}
+#intro-video {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+display: none;
+z-index: 10;
+}
+#black-screen {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: #000000;
+opacity: 0;
+z-index: 11;
+pointer-events: none;
+}
+#loading-circle {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+width: 50px;
+height: 50px;
+border: 5px solid #999999;
+border-top: 5px solid transparent;
+border-radius: 50%;
+animation: spin 1s linear infinite;
+display: none;
+z-index: 12;
+}
+@keyframes spin {
+0% { transform: translate(-50%, -50%) rotate(0deg); }
+100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+#lock {
+position: absolute;
+font-size: 120px;
+color: #999999;
+text-shadow: 0 0 10px #ff0000;
+z-index: 15;
+display: none;
+}
+.glitch {
+animation: glitch 0.15s infinite alternate;
+}
+.glitch-text {
+animation: glitch-text 0.3s infinite alternate; /* Slower for subtler effect */
+}
+.twitch {
+animation: twitch 0.3s infinite alternate; /* Slower for subtler effect */
+}
+.glitch-page {
+animation: glitch-page 0.1s infinite alternate;
+}
+@keyframes glitch {
+0% { transform: translate(0, 0); opacity: 1; }
+25% { transform: translate(7px, -7px); opacity: 0.6; }
+50% { transform: translate(-7px, 7px); opacity: 0.4; }
+75% { transform: translate(5px, 5px); opacity: 0.7; }
+100% { transform: translate(0, 0); opacity: 1; }
+}
+@keyframes glitch-text {
+0% { transform: skew(0deg); opacity: 0.9; color: #999999; } /* Higher opacity, less skew */
+25% { transform: skew(2deg); opacity: 0.85; color: #cc00cc; }
+50% { transform: skew(-2deg); opacity: 0.9; color: #999999; }
+75% { transform: skew(1deg); opacity: 0.95; color: #cc00cc; }
+100% { transform: skew(0deg); opacity: 0.9; color: #999999; }
+}
+@keyframes twitch {
+0% { transform: translate(0, 0); }
+25% { transform: translate(2px, -2px); } /* Smaller translations */
+50% { transform: translate(-2px, 2px); }
+75% { transform: translate(1px, -1px); }
+100% { transform: translate(0, 0); }
+}
+@keyframes glitch-page {
+0% { transform: translate(0, 0); }
+25% { transform: translate(7px, -7px); }
+50% { transform: translate(-7px, 7px); }
+75% { transform: translate(5px, 5px); }
+100% { transform: translate(0, 0); }
+}
+.fade-out {
+animation: fadeOut 1s forwards;
+}
+.fade-in {
+animation: fadeIn 1s forwards;
+}
+@keyframes fadeOut {
+from { opacity: 1; }
+to { opacity: 0; }
+}
+@keyframes fadeIn {
+from { opacity: 0; }
+to { opacity: 1; }
+}
+.dim {
+animation: dim 10s linear forwards;
+}
+@keyframes dim {
+from { opacity: 1; }
+to { opacity: 0.1; }
+}
+.scary-end {
+animation: scary-end 2s infinite alternate;
+}
+@keyframes scary-end {
+0% { transform: scale(1); opacity: 1; color: #999999; }
+20% { transform: scale(1.1) skew(5deg); opacity: 0.7; color: #cc00cc; }
+40% { transform: scale(0.9) skew(-5deg); opacity: 0.5; color: #999999; }
+60% { transform: scale(1.05) skew(3deg); opacity: 0.8; color: #cc00cc; }
+80% { transform: scale(0.95) skew(-3deg); opacity: 0.6; color: #999999; }
+100% { transform: scale(1); opacity: 1; color: #999999; }
+}
+#room {
+text-align: center;
+max-width: 80%;
+}
+#story {
+font-size: 28px;
+text-shadow: 0 0 5px #ffffff;
+margin-bottom: 20px;
+white-space: pre-wrap;
+overflow: hidden;
+border-right: 2px solid #ffffff;
+animation: typing 5s steps(40, end), blink-caret 0.75s step-end infinite; /* Removed glitch-text, twitch */
+}
+#riddle {
+font-size: 24px;
+text-shadow: 0 0 5px #ffffff;
+margin-bottom: 20px;
+white-space: pre-wrap;
+overflow: hidden;
+border-right: 2px solid #ffffff;
+animation: typing 5s steps(40, end), blink-caret 0.75s step-end infinite, glitch-text 0.3s infinite alternate, twitch 0.3s infinite alternate; /* Subtler animations */
+}
+@keyframes typing {
+from { width: 0; }
+to { width: 100%; }
+}
+@keyframes blink-caret {
+from, to { border-color: transparent; }
+50% { border-color: #ffffff; }
+}
+#clue-bar {
+position: absolute;
+top: 10px;
+left: 10px;
+background: #000000;
+padding: 10px;
+border: 2px solid #333333;
+border-radius: 5px;
+}
+#timer {
+position: absolute;
+top: 10px;
+right: 10px;
+font-size: 24px;
+color: #999999;
+text-shadow: 0 0 10px #ff0000;
+font-family: 'Creepster', cursive;
+}
+#clue-button, #submit-button, #home-button {
+padding: 10px 20px;
+margin: 5px;
+cursor: pointer;
+background: #000000;
+border: 2px solid #333333;
+color: #999999;
+border-radius: 5px;
+font-family: 'Times New Roman', Times, serif;
+font-size: 24px;
+text-shadow: 0 0 5px #ffffff;
+}
+#clue-button:hover, #submit-button:hover, #home-button:hover {
+background: #666666;
+}
+#clue-button.glitch-red {
+background: #ff0000;
+animation: glitch 0.15s infinite alternate;
+}
+#home-button {
+display: none;
+}
+#code-input {
+padding: 10px;
+margin: 10px;
+font-size: 24px;
+background: #000000;
+color: #999999;
+border: 2px solid #333333;
+border-radius: 5px;
+font-family: 'Times New Roman', Times, serif;
+text-shadow: 0 0 5px #ffffff;
+}
+#dial-pad {
+display: none;
+grid-template-columns: repeat(3, 60px);
+gap: 10px;
+margin: 20px auto;
+}
+.dial-button {
+width: 60px;
+height: 60px;
+background: #000000;
+border: 2px solid #333333;
+color: #999999;
+font-family: 'Times New Roman', Times, serif;
+font-size: 24px;
+cursor: pointer;
+border-radius: 5px;
+text-align: center;
+line-height: 60px;
+text-shadow: 0 0 5px #ffffff;
+}
+.dial-button:hover {
+background: #666666;
+}
+#message {
+margin-top: 10px;
+font-size: 36px;
+text-shadow: 0 0 5px #ffffff;
+display: none;
+font-family: 'Times New Roman', Times, serif;
+} /* Removed glitch-text, twitch */
+#message.wrong {
+display: block;
+}
+#message.game-over {
+font-size: 48px;
+color: #999999;
+text-shadow: 0 0 10px #ff0000;
+animation: scary-end 2s infinite alternate;
+}
+</style>
 </head>
 <body>
-    <div id="game-container">
-        <div id="black-screen" class="flicker"></div>
-        <div id="loading-circle"></div>
-        <iframe id="intro-video" src="https://www.youtube.com/embed/S8ZvgZF7ia0?autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-        <div id="lock" class="glitch">🔓</div>
-        <audio id="scream-sound" preload="auto">
-            <!-- Replace with your eerie sound file -->
-            <source src="path/to/scream.mp3" type="audio/mp3">
-        </audio>
-        <audio id="transition-sound" preload="auto">
-            <!-- Replace with your transition sound file -->
-            <source src="path/to/creepy-transition.mp3" type="audio/mp3">
-        </audio>
-        <div id="timer">20:00</div>
-        <div id="room">
-            <div id="clue-bar">
-                Clues: <span id="clue-count">0</span>
-                <button id="clue-button">Get Clue</button>
-            </div>
-            <div id="story"></div>
-            <div id="riddle"></div>
-            <h1 id="room-title" style="font-family: 'Creepster', cursive; color: #999999; text-shadow: 0 0 10px #ff0000;">Room 1</h1>
-            <input type="text" id="code-input" placeholder="Enter answer or code">
-            <div id="dial-pad">
-                <div class="dial-button" data-value="1">1</div>
-                <div class="dial-button" data-value="2">2</div>
-                <div class="dial-button" data-value="3">3</div>
-                <div class="dial-button" data-value="4">4</div>
-                <div class="dial-button" data-value="5">5</div>
-                <div class="dial-button" data-value="6">6</div>
-                <div class="dial-button" data-value="7">7</div>
-                <div class="dial-button" data-value="8">8</div>
-                <div class="dial-button" data-value="9">9</div>
-            </div>
-            <button id="submit-button">Submit</button>
-            <button id="home-button">Home</button>
-            <div id="message"></div>
-        </div>
-    </div>
-    <script>
-        const rooms = [
-            {
-                code: "ECHO",
-                clue: "I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?",
-                story: "The gallery whispers your name, a sound bouncing off cursed walls, demanding a word to unlock the door.",
-                background: "#000000"
-            },
-            {
-                code: "PIANO",
-                clue: "I have keys but can't open locks. What am I?",
-                story: "A piano in the corner plays itself, its keys spelling a word in the dark.",
-                background: "#000000"
-            },
-            {
-                code: "RIVER",
-                clue: "I run but never walk, have a bed but never sleep. What am I?",
-                story: "The floor ripples like water, a word carved in the current guiding you forward.",
-                background: "#000000"
-            },
-            {
-                code: "SHADOW",
-                clue: "I follow you always but flee from light. What am I?",
-                story: "Your shadow moves on its own, whispering a word in the flickering light.",
-                background: "#000000"
-            },
-            {
-                code: "CANDLE",
-                clue: "I burn without a flame, my life shortens as I give light. What am I?",
-                story: "A candle drips wax, forming a word as it gutters in the cursed air.",
-                background: "#000000"
-            },
-            {
-                code: "MIRROR",
-                clue: "I show you what you are but never what you see. What am I?",
-                story: "A mirror reflects a twisted face, a word etched in its glass.",
-                background: "#000000"
-            },
-            {
-                code: "DREAM",
-                clue: "I am where you go when you sleep, but I vanish when you wake. What am I?",
-                story: "The gallery shifts like a nightmare, a word forming in the haze.",
-                background: "#000000"
-            },
-            {
-                code: "SILENCE",
-                clue: "The less you hear, the louder I am. What am I?",
-                story: "The gallery falls deathly quiet, a word echoing in the absence of sound.",
-                background: "#000000"
-            },
-            {
-                code: "RIDDLE",
-                clue: "I am a question wrapped in words, solved by wit. What am I?",
-                story: "The paintings mock you with puzzles, a word carved into their frames.",
-                background: "#000000"
-            },
-            {
-                code: "FOOTPRINTS",
-                clue: "The more you take, the more you leave behind. What am I?",
-                story: "Footprints trail you, forming a word in the dust of the cursed floor.",
-                background: "#000000"
-            },
-            {
-                code: "TOMORROW",
-                clue: "I am always coming but never arrive. What am I?",
-                story: "A clock ticks backward, its hands spelling a word of lost time.",
-                background: "#000000"
-            },
-            {
-                code: "6799",
-                clue: "The final key to skip rooms lies in the monster’s gaze. Enter the four-digit code.",
-                story: "Monsters from forgotten games leer, skulls grinning. Enter the final code to skip ahead.",
-                background: "#000000"
-            }
-            // Extend to 30 rooms, e.g.:
-            // { code: "SECRET", clue: "I am hidden but always there, revealed only to those who seek. What am I?", story: "A hidden panel clicks, revealing a word in the shadows.", background: "#000000" }
-        ];
-        let currentRoom = 0;
-        let clueCount = 0;
-        let levelsCompleted = 0;
-        let clueAttempts = 0;
-        let inSpecialRoom = false;
-        let timeLeft = 1200; // 20 minutes in seconds
-        let autoSubmitTimeout = null;
-
-        const blackScreen = document.getElementById('black-screen');
-        const loadingCircle = document.getElementById('loading-circle');
-        const introVideo = document.getElementById('intro-video');
-        const lock = document.getElementById('lock');
-        const roomDisplay = document.getElementById('room');
-        const clueButton = document.getElementById('clue-button');
-        const clueCountDisplay = document.getElementById('clue-count');
-        const submitButton = document.getElementById('submit-button');
-        const homeButton = document.getElementById('home-button');
-        const codeInput = document.getElementById('code-input');
-        const dialPad = document.getElementById('dial-pad');
-        const message = document.getElementById('message');
-        const roomTitle = document.getElementById('room-title');
-        const storyDisplay = document.getElementById('story');
-        const riddleDisplay = document.getElementById('riddle');
-        const timerDisplay = document.getElementById('timer');
-        const gameContainer = document.getElementById('game-container');
-
-        const screamSound = document.getElementById('scream-sound');
-        const transitionSound = document.getElementById('transition-sound');
-
-        // Set initial background and riddle
-        gameContainer.style.background = rooms[0].background;
-        riddleDisplay.textContent = rooms[0].clue;
-
-        // Disable clue and home buttons initially
-        clueButton.disabled = true;
-        homeButton.style.display = 'none';
-
-        // Auto-submit logic for special room
-        function scheduleAutoSubmit() {
-            if (inSpecialRoom && codeInput.value.trim().length > 0) {
-                clearTimeout(autoSubmitTimeout);
-                autoSubmitTimeout = setTimeout(() => {
-                    submitCode();
-                }, 5000); // 5 seconds
-            }
-        }
-
-        // Handle input changes
-        codeInput.addEventListener('input', () => {
-            if (inSpecialRoom) {
-                scheduleAutoSubmit();
-            }
-        });
-
-        // Timer logic
-        function updateTimer() {
-            if (timeLeft <= 0) {
-                endGame();
-                return;
-            }
-            timeLeft--;
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            timerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-            if (timeLeft <= 10) {
-                roomDisplay.classList.add('glitch-page', 'dim');
-                timerDisplay.style.opacity = 1; // Keep timer visible
-            }
-            setTimeout(updateTimer, 1000);
-        }
-
-        // Start game with fade-out and video
-        window.onload = () => {
-            roomDisplay.classList.add('fade-out');
-            storyDisplay.textContent = rooms[0].story;
-            setTimeout(() => {
-                blackScreen.style.display = 'block';
-                blackScreen.classList.add('fade-in', 'flicker');
-                transitionSound.play().catch(() => {});
-                setTimeout(() => {
-                    introVideo.style.display = 'block';
-                    setTimeout(() => {
-                        proceedToGame();
-                    }, 10000); // Play YouTube video for 10 seconds
-                }, 1000);
-            }, 1000);
-            updateTimer();
-        };
-
-        // Proceed to game after video
-        function proceedToGame() {
-            introVideo.style.display = 'none';
-            blackScreen.classList.add('fade-out');
-            setTimeout(() => {
-                blackScreen.style.display = 'none';
-                blackScreen.classList.remove('flicker');
-                roomDisplay.classList.remove('fade-out');
-                roomDisplay.classList.add('fade-in');
-                message.textContent = '';
-            }, 1000);
-        }
-
-        // End game sequence
-        function endGame() {
-            roomDisplay.style.display = 'none';
-            timerDisplay.style.display = 'none';
-            blackScreen.style.display = 'block';
-            blackScreen.classList.add('fade-in');
-            loadingCircle.style.display = 'block';
-            setTimeout(() => {
-                loadingCircle.style.display = 'none';
-                message.textContent = "YOU LOST";
-                message.classList.add('wrong', 'game-over');
-                message.style.display = 'block';
-                setTimeout(() => {
-                    message.textContent = "GAME OVER";
-                    message.classList.add('scary-end');
-                    screamSound.play().catch(() => {});
-                }, 3000);
-            }, 4000);
-        }
-
-        // Handle clue button
-        clueButton.addEventListener('click', () => {
-            clueAttempts++;
-            if (levelsCompleted >= 2 && clueCount < 1) {
-                clueCount++;
-                clueCountDisplay.textContent = clueCount;
-                message.textContent = rooms[currentRoom].clue;
-            } else {
-                clueButton.classList.add('glitch-red');
-                screamSound.play().catch(() => {});
-                message.textContent = levelsCompleted < 2 ? "Complete two levels to unlock a clue!" : "No more clues available!";
-                setTimeout(() => {
-                    clueButton.classList.remove('glitch-red');
-                }, 1000);
-            }
-        });
-
-        // Handle home button
-        homeButton.addEventListener('click', () => {
-            clearTimeout(autoSubmitTimeout);
-            currentRoom = 0;
-            inSpecialRoom = false;
-            roomTitle.textContent = `Room 1`;
-            storyDisplay.textContent = rooms[0].story;
-            riddleDisplay.textContent = rooms[0].clue;
-            gameContainer.style.background = rooms[0].background;
-            codeInput.value = '';
-            codeInput.style.display = 'inline-block';
-            dialPad.style.display = 'none';
-            message.textContent = '';
-            homeButton.style.display = 'none';
-            submitButton.style.display = 'inline-block';
-            clueButton.style.display = 'inline-block';
-            roomDisplay.classList.add('fade-in');
-        });
-
-        // Handle dial pad buttons
-        document.querySelectorAll('.dial-button').forEach(button => {
-            button.addEventListener('click', () => {
-                codeInput.value += button.getAttribute('data-value');
-                if (inSpecialRoom) {
-                    scheduleAutoSubmit();
-                }
-            });
-        });
-
-        // Handle code submission
-        function submitCode() {
-            const input = codeInput.value.trim().toUpperCase();
-            if (inSpecialRoom) {
-                if (input === rooms[rooms.length - 1].code) {
-                    clearTimeout(autoSubmitTimeout);
-                    transitionToRoom(6); // Skip to Room 7 (skipping 5 rooms: 2-6)
-                } else {
-                    message.textContent = "WRONG";
-                    message.classList.add('wrong');
-                    screamSound.play().catch(() => {});
-                    homeButton.style.display = 'inline-block';
-                    setTimeout(() => {
-                        clearTimeout(autoSubmitTimeout);
-                        transitionToRoom(1); // Auto-advance to Room 2
-                    }, 3000);
-                }
-            } else if (currentRoom === 0) {
-                if (input === rooms[0].code) {
-                    transitionToRoom(1); // Correct riddle, go to Room 2
-                } else if (input === '9904') {
-                    inSpecialRoom = true;
-                    roomTitle.textContent = "Cursed Chamber";
-                    storyDisplay.textContent = rooms[rooms.length - 1].story;
-                    riddleDisplay.textContent = rooms[rooms.length - 1].clue;
-                    gameContainer.style.background = rooms[rooms.length - 1].background;
-                    codeInput.value = '';
-                    codeInput.style.display = 'inline-block';
-                    dialPad.style.display = 'grid';
-                    submitButton.style.display = 'none';
-                    message.textContent = "Enter the final code using the dial pad or keyboard. Code will submit after 5 seconds.";
-                    roomDisplay.classList.add('fade-in');
-                    scheduleAutoSubmit();
-                } else {
-                    message.textContent = "WRONG";
-                    message.classList.add('wrong');
-                    screamSound.play().catch(() => {});
-                    homeButton.style.display = 'inline-block';
-                    setTimeout(() => {
-                        transitionToRoom(1); // Auto-advance to Room 2
-                    }, 3000);
-                }
-            } else if (input === rooms[currentRoom].code) {
-                levelsCompleted++;
-                if (levelsCompleted >= 2) clueButton.disabled = false;
-                message.textContent = "Correct! The lock opens.";
-                transitionToNextRoom();
-            } else {
-                message.textContent = "WRONG";
-                message.classList.add('wrong');
-                screamSound.play().catch(() => {});
-                setTimeout(() => {
-                    message.classList.remove('wrong');
-                    message.textContent = '';
-                    codeInput.value = '';
-                }, 3000);
-            }
-        }
-
-        // Handle manual submission (non-special rooms)
-        submitButton.addEventListener('click', () => {
-            if (!inSpecialRoom) {
-                submitCode();
-            }
-        });
-
-        // Transition to next room
-        function transitionToNextRoom() {
-            roomDisplay.classList.add('fade-out');
-            transitionSound.play().catch(() => {});
-            setTimeout(() => {
-                blackScreen.style.display = 'block';
-                blackScreen.classList.add('fade-in', 'flicker');
-                setTimeout(() => {
-                    lock.style.display = 'block';
-                    lock.classList.add('glitch');
-                    setTimeout(() => {
-                        lock.style.display = 'none';
-                        lock.classList.remove('glitch');
-                        currentRoom++;
-                        if (currentRoom < rooms.length - 1) {
-                            roomTitle.textContent = `Room ${currentRoom + 1}`;
-                            storyDisplay.textContent = rooms[currentRoom].story;
-                            riddleDisplay.textContent = rooms[currentRoom].clue;
-                            gameContainer.style.background = rooms[currentRoom].background;
-                            codeInput.value = '';
-                            message.textContent = '';
-                            codeInput.style.display = 'inline-block';
-                            dialPad.style.display = 'none';
-                            submitButton.style.display = 'inline-block';
-                            blackScreen.classList.add('fade-out');
-                            setTimeout(() => {
-                                blackScreen.style.display = 'none';
-                                blackScreen.classList.remove('flicker');
-                                roomDisplay.classList.remove('fade-out');
-                                roomDisplay.classList.add('fade-in');
-                            }, 1000);
-                        } else {
-                            storyDisplay.textContent = "You escaped... but the gallery's curse lingers in your soul.";
-                            riddleDisplay.textContent = "";
-                            roomTitle.textContent = "Escape Complete";
-                            message.textContent = "Congratulations! You survived!";
-                            gameContainer.style.background = "#000000";
-                            codeInput.style.display = 'none';
-                            submitButton.style.display = 'none';
-                            clueButton.style.display = 'none';
-                            roomDisplay.classList.remove('fade-out');
-                            roomDisplay.classList.add('fade-in');
-                            blackScreen.style.display = 'none';
-                            blackScreen.classList.remove('flicker');
-                        }
-                    }, 2000); // Glitch lock for 2 seconds
-                }, 1000);
-            }, 1000);
-        }
-
-        // Transition to specific room
-        function transitionToRoom(roomIndex) {
-            roomDisplay.classList.add('fade-out');
-            transitionSound.play().catch(() => {});
-            setTimeout(() => {
-                blackScreen.style.display = 'block';
-                blackScreen.classList.add('fade-in', 'flicker');
-                setTimeout(() => {
-                    lock.style.display = 'block';
-                    lock.classList.add('glitch');
-                    setTimeout(() => {
-                        lock.style.display = 'none';
-                        lock.classList.remove('glitch');
-                        currentRoom = roomIndex;
-                        inSpecialRoom = false;
-                        roomTitle.textContent = `Room ${currentRoom + 1}`;
-                        storyDisplay.textContent = rooms[currentRoom].story;
-                        riddleDisplay.textContent = rooms[currentRoom].clue;
-                        gameContainer.style.background = rooms[currentRoom].background;
-                        codeInput.value = '';
-                        message.textContent = '';
-                        codeInput.style.display = 'inline-block';
-                        dialPad.style.display = 'none';
-                        submitButton.style.display = 'inline-block';
-                        homeButton.style.display = 'none';
-                        blackScreen.classList.add('fade-out');
-                        setTimeout(() => {
-                            blackScreen.style.display = 'none';
-                            blackScreen.classList.remove('flicker');
-                            roomDisplay.classList.remove('fade-out');
-                            roomDisplay.classList.add('fade-in');
-                        }, 1000);
-                    }, 2000);
-                }, 1000);
-            }, 1000);
-        }
-    </script>
+<div id="game-container">
+<div id="black-screen" class="flicker"></div>
+<div id="loading-circle"></div>
+<iframe id="intro-video" src="https://www.youtube.com/embed/S8ZvgZF7ia0?autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<div id="lock" class="glitch">🔓</div>
+<audio id="scream-sound" preload="auto">
+<source src="path/to/scream.mp3" type="audio/mp3">
+</audio>
+<audio id="transition-sound" preload="auto">
+<source src="path/to/creepy-transition.mp3" type="audio/mp3">
+</audio>
+<div id="timer">20:00</div>
+<div id="room">
+<div id="clue-bar">
+Clues: <span id="clue-count">0</span>
+<button id="clue-button">Get Clue</button>
+</div>
+<div id="story"></div>
+<div id="riddle"></div>
+<h1 id="room-title" style="font-family: 'Creepster', cursive; color: #999999; text-shadow: 0 0 10px #ff0000;">Room 1</h1>
+<input type="text" id="code-input" placeholder="Enter answer or code">
+<div id="dial-pad">
+<div class="dial-button" data-value="1">1</div>
+<div class="dial-button" data-value="2">2</div>
+<div class="dial-button" data-value="3">3</div>
+<div class="dial-button" data-value="4">4</div>
+<div class="dial-button" data-value="5">5</div>
+<div class="dial-button" data-value="6">6</div>
+<div class="dial-button" data-value="7">7</div>
+<div class="dial-button" data-value="8">8</div>
+<div class="dial-button" data-value="9">9</div>
+</div>
+<button id="submit-button">Submit</button>
+<button id="home-button">Home</button>
+<div id="message"></div>
+</div>
+</div>
+<script>
+const rooms = [
+{ code: "five", clue: "🔐 PUZZLE 1: The Cosmic Tally\n\nThe word is 5 letters.\nIt’s what you do to track stars in the cursed sky.\n❄️ Change one letter, it becomes a frozen wasteland’s crust.\n🎶 Change another letter from the original, it becomes a bard’s haunting tune.\n🧠 What’s the word?", story: "A forgotten telescope reveals a constellation forming an ancient sigil, its meaning lost to time.", background: "#000000" },
+{ code: "twelve", clue: "🔐 PUZZLE 2: The Zodiac Cycle\n\nThe word is 5 letters.\nIt’s the circle of celestial guardians watching the night.\n🌊 Change one letter, it becomes the ocean’s rhythmic tide.\n📜 Change another letter from the original, it becomes a tome’s ancient script.\n🧠 What’s the word?", story: "A cracked sundial casts eerie shadows, marking the hours of an eternal night.", background: "#000000" },
+{ code: "eight", clue: "🔐 PUZZLE 3: The Spider’s Web\n\nThe word is 5 letters.\nIt’s the legs of a creature weaving fate’s dark threads.\n🔥 Change one letter, it becomes a blaze that devours.\n👻 Change another letter from the original, it becomes a specter’s chilling form.\n🧠 What’s the word?", story: "A dusty book opens to a page of cryptic star charts, glowing faintly in the dark.", background: "#000000" },
+{ code: "blackjack", clue: "🔐 PUZZLE 4: The Gambler’s Fate\n\nThe word is 5 letters.\nIt’s a game where luck and skill tempt the abyss.\n🪞 Change one letter, it becomes a mirror’s cold reflection.\n🎁 Change another letter from the original, it becomes a gift from the shadows.\n🧠 What’s the word?", story: "A locked chest hums with otherworldly energy, its carvings pulsing faintly.", background: "#000000" },
+{ code: "one", clue: "🔐 PUZZLE 5: The Singular Essence\n\nThe word is 5 letters, a term for singularity.\nIt’s the spark where all paths merge in silence.\n🌟 Change one letter, it becomes a star’s radiant light.\n🕊️ Change another letter from the original, it becomes a dove’s gentle grace.\n🧠 Name the concept it represents.", story: "A stone tablet vibrates, inscribed with runes from a forgotten civilization.", background: "#000000" },
+{ code: "four", clue: "🔐 PUZZLE 6: The Sacred Corners\n\nThe word is 5 letters, a term for a quartet.\nIt’s the anchors of a square guarding ancient secrets.\n🏞️ Change one letter, it becomes a valley’s misty embrace.\n🪨 Change another letter from the original, it becomes a boulder’s unyielding form.\n🧠 Name the concept it represents.", story: "A celestial globe spins slowly, its stars whispering of cosmic secrets.", background: "#000000" },
+{ code: "fourteen", clue: "🔐 PUZZLE 7: The Star’s Facets\n\nThe word is 5 letters.\nIt’s the faces of a celestial form unbound by chains.\n🌫️ Change one letter, it becomes a fog’s ghostly veil.\n🛡️ Change another letter from the original, it becomes a knight’s protective guard.\n🧠 What’s the word?", story: "A ghostly figure points to a mural of a dying star, its light long faded.", background: "#000000" },
+{ code: "taxi", clue: "🔐 PUZZLE 8: The Journey’s Call\n\nThe word is 5 letters.\nIt’s the ride that carries tales through the night.\n🪞 Change one letter, it becomes a mirror’s eerie gleam.\n🎁 Change another letter from the original, it becomes a gift from the void.\n🧠 What’s the word?", story: "A pendulum swings in an impossible rhythm, defying the laws of time.", background: "#000000" },
+{ code: "four", clue: "🔐 PUZZLE 9: The Silent Notes\n\nThe word is 5 letters, a term for a quartet.\nIt’s the chords woven in a hymn of shadows.\n🌹 Change one letter, it becomes a rose’s thorny bloom.\n🦁 Change another letter from the original, it becomes a lion’s fierce roar.\n🧠 Name the concept it represents.", story: "A chandelier flickers, casting shadows that dance to an unseen melody.", background: "#000000" },
+{ code: "ten", clue: "🔐 PUZZLE 10: The Mortal Grasp\n\nThe word is 5 letters, a term for a decade.\nIt’s what hands use to seize the cosmic key.\n⛺ Change one letter, it becomes a camp’s sturdy shelter.\n🦷 Change another letter from the original, it becomes a fang’s sharp bite.\n🧠 Name the concept it represents.", story: "A spectral voice hums a tune, its notes echoing through the void.", background: "#000000" },
+{ code: "five", clue: "🔐 PUZZLE 11: The Mystic Hues\n\nThe word is 5 letters.\nIt’s the shades coloring a triangle’s cursed edges.\n🍃 Change one letter, it becomes a leaf’s verdant glow.\n🪦 Change another letter from the original, it becomes a grave’s silent marker.\n🧠 What’s the word?", story: "A mosaic floor shifts, revealing patterns of an ancient celestial map.", background: "#000000" },
+{ code: "sixtyseven", clue: "🔐 PUZZLE 12: The Week’s Rest\n\nThe word is 5 letters.\nIt’s the rhythm of a sacred pause in time.\n🌧️ Change one letter, it becomes a storm’s drenching veil.\n🕰️ Change another letter from the original, it becomes a clock’s endless tick.\n🧠 What’s the word?", story: "A rusted astrolabe clicks, aligning to a forgotten constellation.", background: "#000000" },
+{ code: "twentyfive", clue: "🔐 PUZZLE 13: The Starry Veil\n\nThe word is 5 letters.\nIt’s the echo of a celestial curtain’s form.\n🦢 Change one letter, it becomes a swan’s graceful glide.\n🛠️ Change another letter from the original, it becomes a tool’s sharp edge.\n🧠 What’s the word?", story: "A mirror reflects a void, its surface rippling with unseen forces.", background: "#000000" },
+{ code: "seven", clue: "🔐 PUZZLE 14: The Creation’s Song\n\nThe word is 5 letters.\nIt’s the days of a divine hymn’s echo.\n🪡 Change one letter, it becomes a needle’s piercing thread.\n🪦 Change another letter from the original, it becomes a tomb’s quiet guard.\n🧠 What’s the word?", story: "A glowing orb pulses, emitting faint whispers of an alien language.", background: "#000000" },
+{ code: "twentyfour", clue: "🔐 PUZZLE 15: The Cube’s Frame\n\nThe word is 5 letters.\nIt’s the edges of a cube woven with truth.\n📖 Change one letter, it becomes a book’s ancient page.\n🪶 Change another letter from the original, it becomes a quill’s delicate stroke.\n🧠 What’s the word?", story: "A stained-glass window shifts, depicting a supernova’s final blaze.", background: "#000000" },
+{ code: "sixtyfour", clue: "🔐 PUZZLE 16: The Square’s Harmony\n\nThe word is 5 letters.\nIt’s the balance of a square’s cosmic embrace.\n🪨 Change one letter, it becomes a rock’s steadfast form.\n🗿 Change another letter from the original, it becomes a statue’s silent gaze.\n🧠 What’s the word?", story: "A ghostly hand traces symbols in the air, fading into the darkness.", background: "#000000" },
+{ code: "fifteen", clue: "🔐 PUZZLE 17: The Star’s Bonds\n\nThe word is 5 letters.\nIt’s the pairs tied by a pentagon’s mystic frame.\n🛶 Change one letter, it becomes a canoe’s gentle glide.\n🦎 Change another letter from the original, it becomes a lizard’s scaly hide.\n🧠 What’s the word?", story: "A clock chimes discordantly, its hands frozen in an impossible hour.", background: "#000000" },
+{ code: "two", clue: "🔐 PUZZLE 18: The Dual Bond\n\nThe word is 5 letters, a term for duality.\nIt’s the smallest tie of cosmic balance.\n🦢 Change one letter, it becomes a swan’s elegant form.\n🪴 Change another letter from the original, it becomes a plant’s rooted growth.\n🧠 Name the concept it represents.", story: "A tapestry unravels, revealing threads woven with cosmic patterns.", background: "#000000" },
+{ code: "five", clue: "🔐 PUZZLE 19: The Faceted Form\n\nThe word is 5 letters.\nIt’s the faces of a many-sided shape, divided by a square.\n🍂 Change one letter, it becomes a leaf’s autumn fall.\n🪦 Change another letter from the original, it becomes a grave’s solemn mark.\n🧠 What’s the word?", story: "A statue’s eyes glow faintly, watching your every move in silence.", background: "#000000" },
+{ code: "mystic", clue: "🔐 PUZZLE 20: The Twin Sentinels\n\nThe word is 5 letters.\nIt’s the child of twin guardians beyond the veil.\n🌊 Change one letter, it becomes a wave’s endless surge.\n🦁 Change another letter from the original, it becomes a lion’s mighty roar.\n🧠 What’s the word?", story: "A vault door creaks, its surface etched with starlit glyphs.", background: "#000000" },
+{ code: "twelve", clue: "🔐 PUZZLE 21: The Soul’s Cycle\n\nThe word is 5 letters.\nIt’s the paths of four spirits in a cosmic dance.\n🌊 Change one letter, it becomes a tide’s rhythmic flow.\n📜 Change another letter from the original, it becomes a scroll’s ancient tale.\n🧠 What’s the word?", story: "A fountain bubbles with black liquid, reflecting a starry abyss.", background: "#000000" },
+{ code: "nine", clue: "🔐 PUZZLE 22: The Shadowed Root\n\nThe word is 5 letters.\nIt’s the root of a trinity’s darkened call.\n🍃 Change one letter, it becomes a vine’s twisting growth.\n🪦 Change another letter from the original, it becomes a tomb’s silent rest.\n🧠 What’s the word?", story: "A celestial map glows, its stars forming an unreadable prophecy.", background: "#000000" },
+{ code: "twenty", clue: "🔐 PUZZLE 23: The Star’s Frame\n\nThe word is 5 letters.\nIt’s the edges of a star joined by a cube’s points.\n⛺ Change one letter, it becomes a tent’s sturdy frame.\n🦷 Change another letter from the original, it becomes a tooth’s sharp bite.\n🧠 What’s the word?", story: "A crystal pulses with light, casting prisms across the cursed walls.", background: "#000000" },
+{ code: "mirror", clue: "🔐 PUZZLE 24: The Reflective Grace\n\nThe word is 5 letters.\nIt’s the glass reflecting a sacred symmetry.\n🌬️ Change one letter, it becomes a breeze’s gentle touch.\n🪶 Change another letter from the original, it becomes a feather’s soft drift.\n🧠 What’s the word?", story: "A phantom wind howls, carrying whispers of an ancient ritual.", background: "#000000" },
+{ code: "three", clue: "🔐 PUZZLE 25: The Divided Balance\n\nThe word is 5 letters, a term for a trio.\nIt’s the harmony of four split in twain.\n🌳 Change one letter, it becomes a tree’s towering form.\n🪶 Change another letter from the original, it becomes a feather’s light dance.\n🧠 Name the concept it represents.", story: "A shadow moves across the ceiling, forming shapes of forgotten gods.", background: "#000000" },
+{ code: "six", clue: "🔐 PUZZLE 26: The Dream’s Key\n\nThe word is 5 letters, a term for a sextet.\nIt’s the key to a cycle of shadowed dreams.\n🪐 Change one letter, it becomes a planet’s distant glow.\n🦁 Change another letter from the original, it becomes a lion’s fierce roar.\n🧠 Name the concept it represents.", story: "A painting bleeds ink, its colors swirling into a cosmic vortex.", background: "#000000" },
+{ code: "eight", clue: "🔐 PUZZLE 27: The Many Faces\n\nThe word is 5 letters.\nIt’s the facets of a form less a cube’s edges.\n🔥 Change one letter, it becomes a flame’s hungry glow.\n👻 Change another letter from the original, it becomes a ghost’s eerie presence.\n🧠 What’s the word?", story: "A ghostly choir sings, their voices echoing through the void.", background: "#000000" },
+{ code: "fifty", clue: "🔐 PUZZLE 28: The Celestial Pact\n\nThe word is 5 letters.\nIt’s the accord where three squares align in the stars.\n🌬️ Change one letter, it becomes a wind’s whispering call.\n🪶 Change another letter from the original, it becomes a feather’s gentle sway.\n🧠 What’s the word?", story: "A starlit altar hums, its surface warm with unnatural energy.", background: "#000000" },
+{ code: "twentyfour", clue: "🔐 PUZZLE 29: The Tetrahedron’s Truth\n\nThe word is 5 letters.\nIt’s the vertices of a tetrahedron woven with a cube.\n📖 Change one letter, it becomes a book’s sacred page.\n🪶 Change another letter from the original, it becomes a quill’s delicate mark.\n🧠 What’s the word?", story: "A locked grimoire glows, its pages turning without touch.", background: "#000000" },
+{ code: "6799", clue: "🔐 PUZZLE 30: The Forbidden Key\n\nThe word is 5 letters.\nIt’s the code to unlock a spectral gate.\n🔢 Change one letter, it becomes a count of shadowed steps.\n🗝️ Change another letter from the original, it becomes a key’s twisted form.\n🧠 What’s the word? (Hint: Enter the first four-digit VIP code.)", story: "A spectral figure offers a forbidden key, its eyes glowing with malice.", background: "#000000" },
+{ code: "9976", clue: "Enter the second four-digit VIP code to reveal this room’s answer.", story: "A cursed relic pulses, promising freedom at a terrible cost.", background: "#000000" }
+];
+let currentRoom = 0;
+let clueCount = 0;
+let levelsCompleted = 0;
+let clueAttempts = 0;
+let inSpecialRoom = false;
+let timeLeft = 1200; // 20 minutes in seconds
+let autoSubmitTimeout = null;
+const blackScreen = document.getElementById('black-screen');
+const loadingCircle = document.getElementById('loading-circle');
+const introVideo = document.getElementById('intro-video');
+const lock = document.getElementById('lock');
+const roomDisplay = document.getElementById('room');
+const clueButton = document.getElementById('clue-button');
+const clueCountDisplay = document.getElementById('clue-count');
+const submitButton = document.getElementById('submit-button');
+const homeButton = document.getElementById('home-button');
+const codeInput = document.getElementById('code-input');
+const dialPad = document.getElementById('dial-pad');
+const message = document.getElementById('message');
+const roomTitle = document.getElementById('room-title');
+const storyDisplay = document.getElementById('story');
+const riddleDisplay = document.getElementById('riddle');
+const timerDisplay = document.getElementById('timer');
+const gameContainer = document.getElementById('game-container');
+const screamSound = document.getElementById('scream-sound');
+const transitionSound = document.getElementById('transition-sound');
+// Set initial background and riddle
+gameContainer.style.background = rooms[0].background;
+riddleDisplay.textContent = rooms[0].clue;
+// Disable clue and home buttons initially
+clueButton.disabled = true;
+homeButton.style.display = 'none';
+// Auto-submit logic for special room
+function scheduleAutoSubmit() {
+if (inSpecialRoom && codeInput.value.trim().length > 0) {
+clearTimeout(autoSubmitTimeout);
+autoSubmitTimeout = setTimeout(() => {
+submitCode();
+}, 7000); // 7 seconds
+}
+}
+// Handle input changes
+codeInput.addEventListener('input', () => {
+if (inSpecialRoom) {
+scheduleAutoSubmit();
+}
+});
+// Timer logic
+function updateTimer() {
+if (timeLeft <= 0) {
+endGame();
+return;
+}
+timeLeft--;
+const minutes = Math.floor(timeLeft / 60);
+const seconds = timeLeft % 60;
+timerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+if (timeLeft <= 10) {
+roomDisplay.classList.add('glitch-page', 'dim');
+timerDisplay.style.opacity = 1; // Keep timer visible
+}
+setTimeout(updateTimer, 1000);
+}
+// Start game with fade-out and video
+window.onload = () => {
+roomDisplay.classList.add('fade-out');
+storyDisplay.textContent = rooms[0].story;
+setTimeout(() => {
+blackScreen.style.display = 'block';
+blackScreen.classList.add('fade-in', 'flicker');
+transitionSound.play().catch(() => {});
+setTimeout(() => {
+introVideo.style.display = 'block';
+setTimeout(() => {
+proceedToGame();
+}, 10000); // Play YouTube video for 10 seconds
+}, 1000);
+}, 1000);
+updateTimer();
+};
+// Proceed to game after video
+function proceedToGame() {
+introVideo.style.display = 'none';
+blackScreen.classList.add('fade-out');
+setTimeout(() => {
+blackScreen.style.display = 'none';
+blackScreen.classList.remove('flicker');
+roomDisplay.classList.remove('fade-out');
+roomDisplay.classList.add('fade-in');
+message.textContent = '';
+}, 1000);
+}
+// End game sequence
+function endGame() {
+roomDisplay.style.display = 'none';
+timerDisplay.style.display = 'none';
+blackScreen.style.display = 'block';
+blackScreen.classList.add('fade-in');
+loadingCircle.style.display = 'block';
+setTimeout(() => {
+loadingCircle.style.display = 'none';
+message.textContent = "YOU LOST";
+message.classList.add('wrong', 'game-over');
+message.style.display = 'block';
+setTimeout(() => {
+message.textContent = "GAME OVER";
+message.classList.add('scary-end');
+screamSound.play().catch(() => {});
+}, 3000);
+}, 4000);
+}
+// Handle clue button
+clueButton.addEventListener('click', () => {
+clueAttempts++;
+if (levelsCompleted >= 2 && clueCount < 1) {
+clueCount++;
+clueCountDisplay.textContent = clueCount;
+message.textContent = rooms[currentRoom].clue;
+} else {
+clueButton.classList.add('glitch-red');
+screamSound.play().catch(() => {});
+message.textContent = levelsCompleted < 2 ? "Complete two levels to unlock a clue!" : "No more clues available!";
+setTimeout(() => {
+clueButton.classList.remove('glitch-red');
+}, 1000);
+}
+});
+// Handle home button
+homeButton.addEventListener('click', () => {
+clearTimeout(autoSubmitTimeout);
+currentRoom = 0;
+inSpecialRoom = false;
+roomTitle.textContent = `Room 1`;
+storyDisplay.textContent = rooms[0].story;
+riddleDisplay.textContent = rooms[0].clue;
+gameContainer.style.background = rooms[0].background;
+codeInput.value = '';
+codeInput.style.display = 'inline-block';
+dialPad.style.display = 'none';
+message.textContent = '';
+homeButton.style.display = 'none';
+submitButton.style.display = 'inline-block';
+clueButton.style.display = 'inline-block';
+roomDisplay.classList.add('fade-in');
+});
+// Handle dial pad buttons
+document.querySelectorAll('.dial-button').forEach(button => {
+button.addEventListener('click', () => {
+codeInput.value += button.getAttribute('data-value');
+if (inSpecialRoom) {
+scheduleAutoSubmit();
+}
+});
+});
+// Handle code submission
+function submitCode() {
+const input = codeInput.value.trim().toLowerCase();
+if (input === "679984029904") {
+const roomNumber = prompt("Enter the room number to access (1-31):");
+const roomIndex = parseInt(roomNumber) - 1;
+if (!isNaN(roomIndex) && roomIndex >= 0 && roomIndex < rooms.length) {
+clearTimeout(autoSubmitTimeout);
+inSpecialRoom = (roomIndex === rooms.length - 1 || roomIndex === rooms.length - 2);
+transitionToRoom(roomIndex);
+message.textContent = `Admin mode: Transported to Room ${roomIndex + 1}`;
+if (inSpecialRoom) {
+dialPad.style.display = 'grid';
+submitButton.style.display = 'none';
+message.textContent = "Enter the final code using the dial pad or keyboard. Code will submit after 7 seconds.";
+scheduleAutoSubmit();
+}
+} else {
+message.textContent = "Invalid room number!";
+message.classList.add('wrong');
+screamSound.play().catch(() => {});
+setTimeout(() => {
+message.classList.remove('wrong');
+message.textContent = '';
+codeInput.value = '';
+}, 2000); // 2 seconds
+}
+return;
+}
+if (inSpecialRoom) {
+if (input === rooms[currentRoom].code) {
+clearTimeout(autoSubmitTimeout);
+transitionToNextRoom();
+} else {
+message.textContent = "WRONG";
+message.classList.add('wrong');
+screamSound.play().catch(() => {});
+homeButton.style.display = 'inline-block';
+setTimeout(() => {
+message.classList.remove('wrong');
+message.textContent = '';
+codeInput.value = '';
+homeButton.style.display = 'none';
+}, 2000); // 2 seconds
+}
+} else if (currentRoom === 0) {
+if (input === rooms[0].code) {
+clearTimeout(autoSubmitTimeout);
+levelsCompleted++;
+if (levelsCompleted >= 2) clueButton.disabled = false;
+message.textContent = "Correct! The lock opens.";
+transitionToNextRoom();
+} else if (input === '6799' || input === '9976') {
+message.textContent = `VIP Code Accepted! Answer for Room 1: ${rooms[0].code}`;
+dialPad.style.display = 'none';
+codeInput.style.display = 'inline-block';
+submitButton.style.display = 'inline-block';
+inSpecialRoom = false;
+clearTimeout(autoSubmitTimeout);
+autoSubmitTimeout = setTimeout(() => {
+levelsCompleted++;
+if (levelsCompleted >= 2) clueButton.disabled = false;
+message.textContent = "Correct! The lock opens.";
+transitionToNextRoom();
+}, 7000); // Auto-advance after 7 seconds
+} else {
+message.textContent = "WRONG";
+message.classList.add('wrong');
+screamSound.play().catch(() => {});
+homeButton.style.display = 'inline-block';
+setTimeout(() => {
+message.classList.remove('wrong');
+message.textContent = '';
+codeInput.value = '';
+homeButton.style.display = 'none';
+}, 2000); // 2 seconds
+}
+} else if (input === rooms[currentRoom].code) {
+clearTimeout(autoSubmitTimeout);
+levelsCompleted++;
+if (levelsCompleted >= 2) clueButton.disabled = false;
+message.textContent = "Correct! The lock opens.";
+transitionToNextRoom();
+} else {
+message.textContent = "WRONG";
+message.classList.add('wrong');
+screamSound.play().catch(() => {});
+setTimeout(() => {
+message.classList.remove('wrong');
+message.textContent = '';
+codeInput.value = '';
+}, 2000); // 2 seconds
+}
+}
+// Handle manual submission (non-special rooms)
+submitButton.addEventListener('click', () => {
+if (!inSpecialRoom) {
+submitCode();
+}
+});
+// Transition to next room
+function transitionToNextRoom() {
+roomDisplay.classList.add('fade-out');
+transitionSound.play().catch(() => {});
+setTimeout(() => {
+blackScreen.style.display = 'block';
+blackScreen.classList.add('fade-in', 'flicker');
+setTimeout(() => {
+lock.style.display = 'block';
+lock.classList.add('glitch');
+setTimeout(() => {
+lock.style.display = 'none';
+lock.classList.remove('glitch');
+currentRoom++;
+if (currentRoom < rooms.length) {
+roomTitle.textContent = `Room ${currentRoom + 1}`;
+storyDisplay.textContent = rooms[currentRoom].story;
+riddleDisplay.textContent = rooms[currentRoom].clue;
+gameContainer.style.background = rooms[currentRoom].background;
+codeInput.value = '';
+message.textContent = '';
+codeInput.style.display = 'inline-block';
+dialPad.style.display = 'none';
+submitButton.style.display = 'inline-block';
+blackScreen.classList.add('fade-out');
+inSpecialRoom = (currentRoom === rooms.length - 1 || currentRoom === rooms.length - 2);
+if (inSpecialRoom) {
+dialPad.style.display = 'grid';
+submitButton.style.display = 'none';
+message.textContent = "Enter the final code using the dial pad or keyboard. Code will submit after 7 seconds.";
+scheduleAutoSubmit();
+}
+setTimeout(() => {
+blackScreen.style.display = 'none';
+blackScreen.classList.remove('flicker');
+roomDisplay.classList.remove('fade-out');
+roomDisplay.classList.add('fade-in');
+}, 1000);
+} else {
+storyDisplay.textContent = "You escaped... but the gallery's curse lingers in your soul.";
+riddleDisplay.textContent = "";
+roomTitle.textContent = "Escape Complete";
+message.textContent = "Congratulations! You survived!";
+gameContainer.style.background = "#000000";
+codeInput.style.display = 'none';
+submitButton.style.display = 'none';
+clueButton.style.display = 'none';
+roomDisplay.classList.remove('fade-out');
+roomDisplay.classList.add('fade-in');
+blackScreen.style.display = 'none';
+blackScreen.classList.remove('flicker');
+}
+}, 2000); // Glitch lock for 2 seconds
+}, 1000);
+}, 1000);
+}
+// Transition to specific room
+function transitionToRoom(roomIndex) {
+roomDisplay.classList.add('fade-out');
+transitionSound.play().catch(() => {});
+setTimeout(() => {
+blackScreen.style.display = 'block';
+blackScreen.classList.add('fade-in', 'flicker');
+setTimeout(() => {
+lock.style.display = 'block';
+lock.classList.add('glitch');
+setTimeout(() => {
+lock.style.display = 'none';
+lock.classList.remove('glitch');
+currentRoom = roomIndex;
+inSpecialRoom = (currentRoom === rooms.length - 1 || currentRoom === rooms.length - 2);
+roomTitle.textContent = `Room ${currentRoom + 1}`;
+storyDisplay.textContent = rooms[currentRoom].story;
+riddleDisplay.textContent = rooms[currentRoom].clue;
+gameContainer.style.background = rooms[currentRoom].background;
+codeInput.value = '';
+message.textContent = '';
+codeInput.style.display = 'inline-block';
+dialPad.style.display = inSpecialRoom ? 'grid' : 'none';
+submitButton.style.display = inSpecialRoom ? 'none' : 'inline-block';
+homeButton.style.display = 'none';
+blackScreen.classList.add('fade-out');
+setTimeout(() => {
+blackScreen.style.display = 'none';
+blackScreen.classList.remove('flicker');
+roomDisplay.classList.remove('fade-out');
+roomDisplay.classList.add('fade-in');
+if (inSpecialRoom) {
+message.textContent = "Enter the final code using the dial pad or keyboard. Code will submit after 7 seconds.";
+scheduleAutoSubmit();
+}
+}, 1000);
+}, 2000);
+}, 1000);
+}, 1000);
+}
+</script>
 </body>
 </html>
