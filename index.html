@@ -75,10 +75,10 @@ display: none;
 animation: glitch 0.15s infinite alternate;
 }
 .glitch-text {
-animation: glitch-text 0.3s infinite alternate; /* Slower for subtler effect */
+animation: glitch-text 0.3s infinite alternate;
 }
 .twitch {
-animation: twitch 0.3s infinite alternate; /* Slower for subtler effect */
+animation: twitch 0.3s infinite alternate;
 }
 .glitch-page {
 animation: glitch-page 0.1s infinite alternate;
@@ -91,7 +91,7 @@ animation: glitch-page 0.1s infinite alternate;
 100% { transform: translate(0, 0); opacity: 1; }
 }
 @keyframes glitch-text {
-0% { transform: skew(0deg); opacity: 0.9; color: #999999; } /* Higher opacity, less skew */
+0% { transform: skew(0deg); opacity: 0.9; color: #999999; }
 25% { transform: skew(2deg); opacity: 0.85; color: #cc00cc; }
 50% { transform: skew(-2deg); opacity: 0.9; color: #999999; }
 75% { transform: skew(1deg); opacity: 0.95; color: #cc00cc; }
@@ -99,7 +99,7 @@ animation: glitch-page 0.1s infinite alternate;
 }
 @keyframes twitch {
 0% { transform: translate(0, 0); }
-25% { transform: translate(2px, -2px); } /* Smaller translations */
+25% { transform: translate(2px, -2px); }
 50% { transform: translate(-2px, 2px); }
 75% { transform: translate(1px, -1px); }
 100% { transform: translate(0, 0); }
@@ -154,7 +154,7 @@ margin-bottom: 20px;
 white-space: pre-wrap;
 overflow: hidden;
 border-right: 2px solid #ffffff;
-animation: typing 5s steps(40, end), blink-caret 0.75s step-end infinite; /* Removed glitch-text, twitch */
+animation: typing 5s steps(40, end), blink-caret 0.75s step-end infinite;
 }
 #riddle {
 font-size: 24px;
@@ -163,7 +163,7 @@ margin-bottom: 20px;
 white-space: pre-wrap;
 overflow: hidden;
 border-right: 2px solid #ffffff;
-animation: typing 5s steps(40, end), blink-caret 0.75s step-end infinite, glitch-text 0.3s infinite alternate, twitch 0.3s infinite alternate; /* Subtler animations */
+animation: typing 5s steps(40, end), blink-caret 0.75s step-end infinite, glitch-text 0.3s infinite alternate, twitch 0.3s infinite alternate;
 }
 @keyframes typing {
 from { width: 0; }
@@ -253,7 +253,7 @@ font-size: 36px;
 text-shadow: 0 0 5px #ffffff;
 display: none;
 font-family: 'Times New Roman', Times, serif;
-} /* Removed glitch-text, twitch */
+}
 #message.wrong {
 display: block;
 }
@@ -277,7 +277,7 @@ animation: scary-end 2s infinite alternate;
 <audio id="transition-sound" preload="auto">
 <source src="path/to/creepy-transition.mp3" type="audio/mp3">
 </audio>
-<div id="timer">20:00</div>
+<div id="timer">15:00</div>
 <div id="room">
 <div id="clue-bar">
 Clues: <span id="clue-count">0</span>
@@ -305,36 +305,36 @@ Clues: <span id="clue-count">0</span>
 </div>
 <script>
 const rooms = [
-{ code: "five", clue: "🔐 PUZZLE 1: The Cosmic Tally\n\nThe word is 5 letters.\nIt’s what you do to track stars in the cursed sky.\n❄️ Change one letter, it becomes a frozen wasteland’s crust.\n🎶 Change another letter from the original, it becomes a bard’s haunting tune.\n🧠 What’s the word?", story: "A forgotten telescope reveals a constellation forming an ancient sigil, its meaning lost to time.", background: "#000000" },
-{ code: "twelve", clue: "🔐 PUZZLE 2: The Zodiac Cycle\n\nThe word is 5 letters.\nIt’s the circle of celestial guardians watching the night.\n🌊 Change one letter, it becomes the ocean’s rhythmic tide.\n📜 Change another letter from the original, it becomes a tome’s ancient script.\n🧠 What’s the word?", story: "A cracked sundial casts eerie shadows, marking the hours of an eternal night.", background: "#000000" },
-{ code: "eight", clue: "🔐 PUZZLE 3: The Spider’s Web\n\nThe word is 5 letters.\nIt’s the legs of a creature weaving fate’s dark threads.\n🔥 Change one letter, it becomes a blaze that devours.\n👻 Change another letter from the original, it becomes a specter’s chilling form.\n🧠 What’s the word?", story: "A dusty book opens to a page of cryptic star charts, glowing faintly in the dark.", background: "#000000" },
-{ code: "blackjack", clue: "🔐 PUZZLE 4: The Gambler’s Fate\n\nThe word is 5 letters.\nIt’s a game where luck and skill tempt the abyss.\n🪞 Change one letter, it becomes a mirror’s cold reflection.\n🎁 Change another letter from the original, it becomes a gift from the shadows.\n🧠 What’s the word?", story: "A locked chest hums with otherworldly energy, its carvings pulsing faintly.", background: "#000000" },
-{ code: "one", clue: "🔐 PUZZLE 5: The Singular Essence\n\nThe word is 5 letters, a term for singularity.\nIt’s the spark where all paths merge in silence.\n🌟 Change one letter, it becomes a star’s radiant light.\n🕊️ Change another letter from the original, it becomes a dove’s gentle grace.\n🧠 Name the concept it represents.", story: "A stone tablet vibrates, inscribed with runes from a forgotten civilization.", background: "#000000" },
-{ code: "four", clue: "🔐 PUZZLE 6: The Sacred Corners\n\nThe word is 5 letters, a term for a quartet.\nIt’s the anchors of a square guarding ancient secrets.\n🏞️ Change one letter, it becomes a valley’s misty embrace.\n🪨 Change another letter from the original, it becomes a boulder’s unyielding form.\n🧠 Name the concept it represents.", story: "A celestial globe spins slowly, its stars whispering of cosmic secrets.", background: "#000000" },
-{ code: "fourteen", clue: "🔐 PUZZLE 7: The Star’s Facets\n\nThe word is 5 letters.\nIt’s the faces of a celestial form unbound by chains.\n🌫️ Change one letter, it becomes a fog’s ghostly veil.\n🛡️ Change another letter from the original, it becomes a knight’s protective guard.\n🧠 What’s the word?", story: "A ghostly figure points to a mural of a dying star, its light long faded.", background: "#000000" },
-{ code: "taxi", clue: "🔐 PUZZLE 8: The Journey’s Call\n\nThe word is 5 letters.\nIt’s the ride that carries tales through the night.\n🪞 Change one letter, it becomes a mirror’s eerie gleam.\n🎁 Change another letter from the original, it becomes a gift from the void.\n🧠 What’s the word?", story: "A pendulum swings in an impossible rhythm, defying the laws of time.", background: "#000000" },
-{ code: "four", clue: "🔐 PUZZLE 9: The Silent Notes\n\nThe word is 5 letters, a term for a quartet.\nIt’s the chords woven in a hymn of shadows.\n🌹 Change one letter, it becomes a rose’s thorny bloom.\n🦁 Change another letter from the original, it becomes a lion’s fierce roar.\n🧠 Name the concept it represents.", story: "A chandelier flickers, casting shadows that dance to an unseen melody.", background: "#000000" },
-{ code: "ten", clue: "🔐 PUZZLE 10: The Mortal Grasp\n\nThe word is 5 letters, a term for a decade.\nIt’s what hands use to seize the cosmic key.\n⛺ Change one letter, it becomes a camp’s sturdy shelter.\n🦷 Change another letter from the original, it becomes a fang’s sharp bite.\n🧠 Name the concept it represents.", story: "A spectral voice hums a tune, its notes echoing through the void.", background: "#000000" },
-{ code: "five", clue: "🔐 PUZZLE 11: The Mystic Hues\n\nThe word is 5 letters.\nIt’s the shades coloring a triangle’s cursed edges.\n🍃 Change one letter, it becomes a leaf’s verdant glow.\n🪦 Change another letter from the original, it becomes a grave’s silent marker.\n🧠 What’s the word?", story: "A mosaic floor shifts, revealing patterns of an ancient celestial map.", background: "#000000" },
-{ code: "sixtyseven", clue: "🔐 PUZZLE 12: The Week’s Rest\n\nThe word is 5 letters.\nIt’s the rhythm of a sacred pause in time.\n🌧️ Change one letter, it becomes a storm’s drenching veil.\n🕰️ Change another letter from the original, it becomes a clock’s endless tick.\n🧠 What’s the word?", story: "A rusted astrolabe clicks, aligning to a forgotten constellation.", background: "#000000" },
-{ code: "twentyfive", clue: "🔐 PUZZLE 13: The Starry Veil\n\nThe word is 5 letters.\nIt’s the echo of a celestial curtain’s form.\n🦢 Change one letter, it becomes a swan’s graceful glide.\n🛠️ Change another letter from the original, it becomes a tool’s sharp edge.\n🧠 What’s the word?", story: "A mirror reflects a void, its surface rippling with unseen forces.", background: "#000000" },
-{ code: "seven", clue: "🔐 PUZZLE 14: The Creation’s Song\n\nThe word is 5 letters.\nIt’s the days of a divine hymn’s echo.\n🪡 Change one letter, it becomes a needle’s piercing thread.\n🪦 Change another letter from the original, it becomes a tomb’s quiet guard.\n🧠 What’s the word?", story: "A glowing orb pulses, emitting faint whispers of an alien language.", background: "#000000" },
-{ code: "twentyfour", clue: "🔐 PUZZLE 15: The Cube’s Frame\n\nThe word is 5 letters.\nIt’s the edges of a cube woven with truth.\n📖 Change one letter, it becomes a book’s ancient page.\n🪶 Change another letter from the original, it becomes a quill’s delicate stroke.\n🧠 What’s the word?", story: "A stained-glass window shifts, depicting a supernova’s final blaze.", background: "#000000" },
-{ code: "sixtyfour", clue: "🔐 PUZZLE 16: The Square’s Harmony\n\nThe word is 5 letters.\nIt’s the balance of a square’s cosmic embrace.\n🪨 Change one letter, it becomes a rock’s steadfast form.\n🗿 Change another letter from the original, it becomes a statue’s silent gaze.\n🧠 What’s the word?", story: "A ghostly hand traces symbols in the air, fading into the darkness.", background: "#000000" },
-{ code: "fifteen", clue: "🔐 PUZZLE 17: The Star’s Bonds\n\nThe word is 5 letters.\nIt’s the pairs tied by a pentagon’s mystic frame.\n🛶 Change one letter, it becomes a canoe’s gentle glide.\n🦎 Change another letter from the original, it becomes a lizard’s scaly hide.\n🧠 What’s the word?", story: "A clock chimes discordantly, its hands frozen in an impossible hour.", background: "#000000" },
-{ code: "two", clue: "🔐 PUZZLE 18: The Dual Bond\n\nThe word is 5 letters, a term for duality.\nIt’s the smallest tie of cosmic balance.\n🦢 Change one letter, it becomes a swan’s elegant form.\n🪴 Change another letter from the original, it becomes a plant’s rooted growth.\n🧠 Name the concept it represents.", story: "A tapestry unravels, revealing threads woven with cosmic patterns.", background: "#000000" },
-{ code: "five", clue: "🔐 PUZZLE 19: The Faceted Form\n\nThe word is 5 letters.\nIt’s the faces of a many-sided shape, divided by a square.\n🍂 Change one letter, it becomes a leaf’s autumn fall.\n🪦 Change another letter from the original, it becomes a grave’s solemn mark.\n🧠 What’s the word?", story: "A statue’s eyes glow faintly, watching your every move in silence.", background: "#000000" },
-{ code: "mystic", clue: "🔐 PUZZLE 20: The Twin Sentinels\n\nThe word is 5 letters.\nIt’s the child of twin guardians beyond the veil.\n🌊 Change one letter, it becomes a wave’s endless surge.\n🦁 Change another letter from the original, it becomes a lion’s mighty roar.\n🧠 What’s the word?", story: "A vault door creaks, its surface etched with starlit glyphs.", background: "#000000" },
-{ code: "twelve", clue: "🔐 PUZZLE 21: The Soul’s Cycle\n\nThe word is 5 letters.\nIt’s the paths of four spirits in a cosmic dance.\n🌊 Change one letter, it becomes a tide’s rhythmic flow.\n📜 Change another letter from the original, it becomes a scroll’s ancient tale.\n🧠 What’s the word?", story: "A fountain bubbles with black liquid, reflecting a starry abyss.", background: "#000000" },
-{ code: "nine", clue: "🔐 PUZZLE 22: The Shadowed Root\n\nThe word is 5 letters.\nIt’s the root of a trinity’s darkened call.\n🍃 Change one letter, it becomes a vine’s twisting growth.\n🪦 Change another letter from the original, it becomes a tomb’s silent rest.\n🧠 What’s the word?", story: "A celestial map glows, its stars forming an unreadable prophecy.", background: "#000000" },
-{ code: "twenty", clue: "🔐 PUZZLE 23: The Star’s Frame\n\nThe word is 5 letters.\nIt’s the edges of a star joined by a cube’s points.\n⛺ Change one letter, it becomes a tent’s sturdy frame.\n🦷 Change another letter from the original, it becomes a tooth’s sharp bite.\n🧠 What’s the word?", story: "A crystal pulses with light, casting prisms across the cursed walls.", background: "#000000" },
-{ code: "mirror", clue: "🔐 PUZZLE 24: The Reflective Grace\n\nThe word is 5 letters.\nIt’s the glass reflecting a sacred symmetry.\n🌬️ Change one letter, it becomes a breeze’s gentle touch.\n🪶 Change another letter from the original, it becomes a feather’s soft drift.\n🧠 What’s the word?", story: "A phantom wind howls, carrying whispers of an ancient ritual.", background: "#000000" },
-{ code: "three", clue: "🔐 PUZZLE 25: The Divided Balance\n\nThe word is 5 letters, a term for a trio.\nIt’s the harmony of four split in twain.\n🌳 Change one letter, it becomes a tree’s towering form.\n🪶 Change another letter from the original, it becomes a feather’s light dance.\n🧠 Name the concept it represents.", story: "A shadow moves across the ceiling, forming shapes of forgotten gods.", background: "#000000" },
-{ code: "six", clue: "🔐 PUZZLE 26: The Dream’s Key\n\nThe word is 5 letters, a term for a sextet.\nIt’s the key to a cycle of shadowed dreams.\n🪐 Change one letter, it becomes a planet’s distant glow.\n🦁 Change another letter from the original, it becomes a lion’s fierce roar.\n🧠 Name the concept it represents.", story: "A painting bleeds ink, its colors swirling into a cosmic vortex.", background: "#000000" },
-{ code: "eight", clue: "🔐 PUZZLE 27: The Many Faces\n\nThe word is 5 letters.\nIt’s the facets of a form less a cube’s edges.\n🔥 Change one letter, it becomes a flame’s hungry glow.\n👻 Change another letter from the original, it becomes a ghost’s eerie presence.\n🧠 What’s the word?", story: "A ghostly choir sings, their voices echoing through the void.", background: "#000000" },
-{ code: "fifty", clue: "🔐 PUZZLE 28: The Celestial Pact\n\nThe word is 5 letters.\nIt’s the accord where three squares align in the stars.\n🌬️ Change one letter, it becomes a wind’s whispering call.\n🪶 Change another letter from the original, it becomes a feather’s gentle sway.\n🧠 What’s the word?", story: "A starlit altar hums, its surface warm with unnatural energy.", background: "#000000" },
-{ code: "twentyfour", clue: "🔐 PUZZLE 29: The Tetrahedron’s Truth\n\nThe word is 5 letters.\nIt’s the vertices of a tetrahedron woven with a cube.\n📖 Change one letter, it becomes a book’s sacred page.\n🪶 Change another letter from the original, it becomes a quill’s delicate mark.\n🧠 What’s the word?", story: "A locked grimoire glows, its pages turning without touch.", background: "#000000" },
-{ code: "6799", clue: "🔐 PUZZLE 30: The Forbidden Key\n\nThe word is 5 letters.\nIt’s the code to unlock a spectral gate.\n🔢 Change one letter, it becomes a count of shadowed steps.\n🗝️ Change another letter from the original, it becomes a key’s twisted form.\n🧠 What’s the word? (Hint: Enter the first four-digit VIP code.)", story: "A spectral figure offers a forbidden key, its eyes glowing with malice.", background: "#000000" },
+{ code: "five", clue: "🔐 PUZZLE 1: The Haunted Tally\n\nThe word is 4 letters.\nIt’s what you do to count items in a haunted room.\n❄️ Change one letter, it becomes a cold winter’s bite.\n🎶 Change another letter from the original, it becomes what ghosts sing at night.\n🧠 What’s the word?", story: "A forgotten telescope reveals a constellation forming an ancient sigil, its meaning lost to time.", background: "#000000" },
+{ code: "twelve", clue: "🔐 PUZZLE 2: The Night’s Hours\n\nThe word is 6 letters.\nIt’s the time that passes in a cursed night.\n🌊 Change one letter, it becomes a river’s gentle flow.\n🕰️ Change another letter from the original, it becomes a clock’s eerie chime.\n🧠 What’s the word?", story: "A cracked sundial casts eerie shadows, marking the hours of an eternal night.", background: "#000000" },
+{ code: "eight", clue: "🔐 PUZZLE 3: The Spider’s Legs\n\nThe word is 5 letters.\nIt’s the number of legs on a spider in a cursed web.\n🔥 Change one letter, it becomes a fire’s glowing spark.\n👻 Change another letter from the original, it becomes a ghost’s fleeting form.\n🧠 What’s the word?", story: "A dusty book opens to a page of cryptic star charts, glowing faintly in the dark.", background: "#000000" },
+{ code: "blackjack", clue: "🔐 PUZZLE 4: The Gambler’s Curse\n\nThe word is 4 letters.\nIt’s a game played in a haunted hall.\n🪞 Change one letter, it becomes a mirror’s dark reflection.\n🎴 Change another letter from the original, it becomes a card’s hidden mark.\n🧠 What’s the word?", story: "A locked chest hums with otherworldly energy, its carvings pulsing faintly.", background: "#000000" },
+{ code: "one", clue: "🔐 PUZZLE 5: The Lone Spark\n\nThe word is 5 letters, a term for singularity.\nIt’s the single light in a shadowed void.\n🌟 Change one letter, it becomes a star’s bright glow.\n🕊️ Change another letter from the original, it becomes a bird of peace.\n🧠 Name the concept it represents.", story: "A stone tablet vibrates, inscribed with runes from a forgotten civilization.", background: "#000000" },
+{ code: "four", clue: "🔐 PUZZLE 6: The Room’s Corners\n\nThe word is 5 letters, a term for a quartet.\nIt’s the corners of a cursed room.\n🏞️ Change one letter, it becomes a valley’s quiet embrace.\n🪨 Change another letter from the original, it becomes a stone’s heavy weight.\n🧠 Name the concept it represents.", story: "A celestial globe spins slowly, its stars whispering of cosmic secrets.", background: "#000000" },
+{ code: "fourteen", clue: "🔐 PUZZLE 7: The Moon’s Faces\n\nThe word is 6 letters.\nIt’s the phases of a moon in a haunted sky.\n🌫️ Change one letter, it becomes a misty morning haze.\n🛡️ Change another letter from the original, it becomes a shield’s strong guard.\n🧠 What’s the word?", story: "A ghostly figure points to a mural of a dying star, its light long faded.", background: "#000000" },
+{ code: "taxi", clue: "🔐 PUZZLE 8: The Night Ride\n\nThe word is 4 letters.\nIt’s a ride through a city’s haunted streets.\n🪞 Change one letter, it becomes a mirror’s cold shine.\n🎁 Change another letter from the original, it becomes a gift from the dark.\n🧠 What’s the word?", story: "A pendulum swings in an impossible rhythm, defying the laws of time.", background: "#000000" },
+{ code: "four", clue: "🔐 PUZZLE 9: The Silent Chords\n\nThe word is 5 letters, a term for a quartet.\nIt’s the notes in a ghostly melody.\n🌹 Change one letter, it becomes a flower’s soft petals.\n🦁 Change another letter from the original, it becomes a beast’s loud roar.\n🧠 Name the concept it represents.", story: "A chandelier flickers, casting shadows that dance to an unseen melody.", background: "#000000" },
+{ code: "ten", clue: "🔐 PUZZLE 10: The Fingers’ Grip\n\nThe word is 4 letters, a term for a decade.\nIt’s what hands use to grasp a cursed key.\n⛺ Change one letter, it becomes a camper’s shelter.\n🦷 Change another letter from the original, it becomes a tooth’s sharp edge.\n🧠 Name the concept it represents.", story: "A spectral voice hums a tune, its notes echoing through the void.", background: "#000000" },
+{ code: "five", clue: "🔐 PUZZLE 11: The Star’s Colors\n\nThe word is 6 letters.\nIt’s the hues on a star in a haunted sky.\n🍃 Change one letter, it becomes a leaf’s green shade.\n🪦 Change another letter from the original, it becomes a grave’s dark stone.\n🧠 What’s the word?", story: "A mosaic floor shifts, revealing patterns of an ancient celestial map.", background: "#000000" },
+{ code: "sixtyseven", clue: "🔐 PUZZLE 12: The Holy Rest\n\nThe word is 7 letters.\nIt’s the sacred pause after a week’s toil.\n🌧️ Change one letter, it becomes a storm’s heavy fall.\n🕰️ Change another letter from the original, it becomes a clock’s steady tick.\n🧠 What’s the word?", story: "A rusted astrolabe clicks, aligning to a forgotten constellation.", background: "#000000" },
+{ code: "twentyfive", clue: "🔐 PUZZLE 13: The Star’s Veil\n\nThe word is 4 letters.\nIt’s the curtain hiding a starry shrine.\n🦢 Change one letter, it becomes a swan’s white grace.\n🛠️ Change another letter from the original, it becomes a tool’s sharp blade.\n🧠 What’s the word?", story: "A mirror reflects a void, its surface rippling with unseen forces.", background: "#000000" },
+{ code: "seven", clue: "🔐 PUZZLE 14: The Holy Days\n\nThe word is 5 letters.\nIt’s the days of a sacred creation.\n🪡 Change one letter, it becomes a needle’s sharp point.\n🪦 Change another letter from the original, it becomes a tomb’s quiet rest.\n🧠 What’s the word?", story: "A glowing orb pulses, emitting faint whispers of an alien language.", background: "#000000" },
+{ code: "twentyfour", clue: "🔐 PUZZLE 15: The Cube’s Edges\n\nThe word is 6 letters.\nIt’s the lines of a cube in a cursed vault.\n📖 Change one letter, it becomes a book’s old page.\n🪶 Change another letter from the original, it becomes a feather’s light touch.\n🧠 What’s the word?", story: "A stained-glass window shifts, depicting a supernova’s final blaze.", background: "#000000" },
+{ code: "sixtyfour", clue: "🔐 PUZZLE 16: The Square’s Form\n\nThe word is 7 letters.\nIt’s the shape of a square in a haunted hall.\n🪨 Change one letter, it becomes a rock’s firm stand.\n🗿 Change another letter from the original, it becomes a statue’s still gaze.\n🧠 What’s the word?", story: "A ghostly hand traces symbols in the air, fading into the darkness.", background: "#000000" },
+{ code: "fifteen", clue: "🔐 PUZZLE 17: The Star’s Ties\n\nThe word is 5 letters.\nIt’s the bonds of a star in a mystic frame.\n🛶 Change one letter, it becomes a boat’s smooth glide.\n🦎 Change another letter from the original, it becomes a lizard’s quick crawl.\n🧠 What’s the word?", story: "A clock chimes discordantly, its hands frozen in an impossible hour.", background: "#000000" },
+{ code: "two", clue: "🔐 PUZZLE 18: The Paired Bond\n\nThe word is 4 letters, a term for duality.\nIt’s the tie between two shadows.\n🦢 Change one letter, it becomes a swan’s soft form.\n🪴 Change another letter from the original, it becomes a plant’s green stem.\n🧠 Name the concept it represents.", story: "A tapestry unravels, revealing threads woven with cosmic patterns.", background: "#000000" },
+{ code: "five", clue: "🔐 PUZZLE 19: The Shape’s Sides\n\nThe word is 6 letters.\nIt’s the sides of a shape in a cursed shrine.\n🍂 Change one letter, it becomes a leaf’s autumn hue.\n🪦 Change another letter from the original, it becomes a grave’s cold mark.\n🧠 What’s the word?", story: "A statue’s eyes glow faintly, watching your every move in silence.", background: "#000000" },
+{ code: "mystic", clue: "🔐 PUZZLE 20: The Hidden Charm\n\nThe word is 5 letters.\nIt’s a charm buried in a haunted vault.\n🌊 Change one letter, it becomes a wave’s steady crash.\n🦁 Change another letter from the original, it becomes a lion’s bold roar.\n🧠 What’s the word?", story: "A vault door creaks, its surface etched with starlit glyphs.", background: "#000000" },
+{ code: "twelve", clue: "🔐 PUZZLE 21: The Night’s Cycle\n\nThe word is 6 letters.\nIt’s the cycle of hours in a ghostly night.\n🌊 Change one letter, it becomes a stream’s quiet flow.\n📜 Change another letter from the original, it becomes a scroll’s old tale.\n🧠 What’s the word?", story: "A fountain bubbles with black liquid, reflecting a starry abyss.", background: "#000000" },
+{ code: "nine", clue: "🔐 PUZZLE 22: The Shadow’s Call\n\nThe word is 4 letters.\nIt’s the call of a trinity in the dark.\n🍃 Change one letter, it becomes a vine’s green twist.\n🪦 Change another letter from the original, it becomes a tomb’s still stone.\n🧠 What’s the word?", story: "A celestial map glows, its stars forming an unreadable prophecy.", background: "#000000" },
+{ code: "twenty", clue: "🔐 PUZZLE 23: The Star’s Points\n\nThe word is 5 letters.\nIt’s the points of a star in a cursed sky.\n⛺ Change one letter, it becomes a tent’s strong frame.\n🦷 Change another letter from the original, it becomes a fang’s sharp tip.\n🧠 What’s the word?", story: "A crystal pulses with light, casting prisms across the cursed walls.", background: "#000000" },
+{ code: "mirror", clue: "🔐 PUZZLE 24: The Glass’s Truth\n\nThe word is 7 letters.\nIt’s the glass that shows a haunted face.\n🌬️ Change one letter, it becomes a wind’s soft breath.\n🪶 Change another letter from the original, it becomes a feather’s light drift.\n🧠 What’s the word?", story: "A phantom wind howls, carrying whispers of an ancient ritual.", background: "#000000" },
+{ code: "three", clue: "🔐 PUZZLE 25: The Triple Bond\n\nThe word is 4 letters, a term for a trio.\nIt’s the bond of three in a cursed hall.\n🌳 Change one letter, it becomes a tree’s tall form.\n🪶 Change another letter from the original, it becomes a feather’s soft fall.\n🧠 Name the concept it represents.", story: "A shadow moves across the ceiling, forming shapes of forgotten gods.", background: "#000000" },
+{ code: "six", clue: "🔐 PUZZLE 26: The Dream’s Lock\n\nThe word is 5 letters, a term for a sextet.\nIt’s the key to a dream in a haunted mind.\n🪐 Change one letter, it becomes a planet’s far glow.\n🦁 Change another letter from the original, it becomes a lion’s loud roar.\n🧠 Name the concept it represents.", story: "A painting bleeds ink, its colors swirling into a cosmic vortex.", background: "#000000" },
+{ code: "eight", clue: "🔐 PUZZLE 27: The Web’s Count\n\nThe word is 6 letters.\nIt’s the count of a spider’s legs in a dark web.\n🔥 Change one letter, it becomes a flame’s hot glow.\n👻 Change another letter from the original, it becomes a ghost’s pale form.\n🧠 What’s the word?", story: "A ghostly choir sings, their voices echoing through the void.", background: "#000000" },
+{ code: "fifty", clue: "🔐 PUZZLE 28: The Star’s Pact\n\nThe word is 4 letters.\nIt’s the pact made in a starry shrine.\n🌬️ Change one letter, it becomes a wind’s cool gust.\n🪶 Change another letter from the original, it becomes a bird’s soft wing.\n🧠 What’s the word?", story: "A starlit altar hums, its surface warm with unnatural energy.", background: "#000000" },
+{ code: "twentyfour", clue: "🔐 PUZZLE 29: The Shape’s Lines\n\nThe word is 6 letters.\nIt’s the lines of a shape in a cursed vault.\n📖 Change one letter, it becomes a book’s worn page.\n🪶 Change another letter from the original, it becomes a quill’s fine stroke.\n🧠 What’s the word?", story: "A locked grimoire glows, its pages turning without touch.", background: "#000000" },
+{ code: "6799", clue: "🔐 PUZZLE 30: The Secret Code\n\nThe word is 5 letters.\nIt’s the key to a spectral lock.\n🔢 Change one letter, it becomes a tally of steps.\n🗝️ Change another letter from the original, it becomes a key’s metal form.\n🧠 What’s the word? (Hint: Enter the first four-digit VIP code.)", story: "A spectral figure offers a forbidden key, its eyes glowing with malice.", background: "#000000" },
 { code: "9976", clue: "Enter the second four-digit VIP code to reveal this room’s answer.", story: "A cursed relic pulses, promising freedom at a terrible cost.", background: "#000000" }
 ];
 let currentRoom = 0;
@@ -342,7 +342,7 @@ let clueCount = 0;
 let levelsCompleted = 0;
 let clueAttempts = 0;
 let inSpecialRoom = false;
-let timeLeft = 1200; // 20 minutes in seconds
+let timeLeft = 900; // 15 minutes in seconds
 let autoSubmitTimeout = null;
 const blackScreen = document.getElementById('black-screen');
 const loadingCircle = document.getElementById('loading-circle');
