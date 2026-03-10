@@ -493,6 +493,80 @@
       background: #f95d00;
       box-shadow: 0 0 15px 3px #f97316;
     }
+
+    /* QR modal styles */
+    #qrModal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 11000;
+      user-select:none;
+      display: none;
+    }
+    #qrModal img {
+      max-width: 300px;
+      max-height: 300px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px var(--neon);
+    }
+    #qrCloseBtn {
+      position: absolute;
+      top: 20px; right: 20px;
+      background: var(--orange);
+      color: #000;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 16px;
+      user-select:none;
+      box-shadow: 0 0 10px var(--orange);
+    }
+    #qrCloseBtn:hover {
+      background: #f95d00;
+    }
+
+    /* Quiz container style */
+    #quizContainer {
+      font-size: 1rem;
+      color: #cceeff;
+      margin-bottom: 1rem;
+      user-select:text;
+    }
+    /* Tic Tac Toe board */
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 70px);
+      grid-template-rows: repeat(3, 70px);
+      gap: 10px;
+      justify-content: center;
+      margin-top: 1rem;
+      user-select:none;
+    }
+    #board div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,255,225,0.1);
+      border: 1px solid var(--neon);
+      font-size: 2.5rem;
+      cursor: pointer;
+      user-select:none;
+      border-radius: 12px;
+      transition: background 0.3s;
+    }
+    #board div:hover {
+      background: rgba(0,255,225,0.3);
+    }
+    #scoreboard {
+      margin-top: 10px;
+      font-weight: 600;
+      user-select:none;
+    }
   </style>
 </head>
 <body>
@@ -637,23 +711,6 @@
       </form>
     </section>
 
-    <section id="adminLoginSection" aria-label="Admin login for appointment management" style="max-width:400px; margin: 0 auto 4rem; border: 1px solid var(--neon); padding:1rem; border-radius:16px;">
-      <h2>Admin Login (Manage Appointments)</h2>
-      <form id="adminLoginForm">
-        <label for="adminUser">Username</label>
-        <input type="text" id="adminUser" autocomplete="username" placeholder="Admin username" required />
-        <label for="adminPass">Password</label>
-        <input type="password" id="adminPass" autocomplete="current-password" placeholder="Admin password" required />
-        <button type="submit" class="btn">Login as Admin</button>
-        <p id="adminLoginStatus" style="margin-top:10px;" aria-live="polite"></p>
-      </form>
-      <div id="adminPanel" style="margin-top: 1rem; display:none; color: var(--neon);">
-        <h3>Appointments</h3>
-        <div id="appointmentsList" style="max-height:300px; overflow-y:auto;"></div>
-        <button id="adminLogoutBtn" class="btn btn-small" style="background:var(--orange); color:#000; margin-top:1rem;">Logout Admin</button>
-      </div>
-    </section>
-
     <section id="ai-form" aria-label="Symptom AI assessment">
       <h2>AI Health Assessment</h2>
       <form style="max-width: 600px; margin: 0 auto;" autocomplete="off">
@@ -673,7 +730,7 @@
     <section id="quiz" style="max-width: 700px; margin: 0 auto;">
       <h2>Health Quiz & Tic Tac Toe</h2>
       <div id="quizContainer" aria-live="polite"></div>
-      <div id="ticTacToe" aria-label="Tic Tac Toe game" style="display:none;">
+      <div id="ticTacToe" aria-label="Tic Tac Toe game" >
         <h3>Tic Tac Toe with AI</h3>
         <div id="board" role="grid" aria-label="Tic Tac Toe game board"></div>
         <div id="scoreboard" aria-live="polite" aria-atomic="true">Score - You: 0 | AI: 0 | Draws: 0</div>
@@ -702,6 +759,12 @@
   <button id="voiceControlBtn" aria-label="Voice command button" title="Click to speak" >
     <i class="fas fa-microphone"></i>
   </button>
+
+  <!-- QR Code Modal -->
+  <div id="qrModal" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+    <button id="qrCloseBtn" aria-label="Close QR code image">Close</button>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=WAYCARE_OFFICIAL" alt="WAY CARE QR Code" />
+  </div>
 
   <footer>
     <div>
@@ -740,10 +803,6 @@
     const signupPassword = document.getElementById('signupPassword');
     const signupPasswordConfirm = document.getElementById('signupPasswordConfirm');
     const welcomeText = document.getElementById('welcome');
-
-    const ADMIN_USER = "nds0822";
-    const ADMIN_PASS = "679984029904";
-    let isAdminLoggedIn = false;
 
     loginTab.addEventListener('click', () => {
       if(loginTab.classList.contains('active')) return;
@@ -812,13 +871,6 @@
     window.addEventListener('load', () => {
       const loggedIn = localStorage.getItem('loggedIn') === 'true';
       const savedUser = localStorage.getItem('username');
-      const adminLogged = localStorage.getItem('adminLogged') === 'true';
-      if(adminLogged){
-        isAdminLoggedIn = true;
-        document.getElementById("adminPanel").style.display = "block";
-        document.getElementById("adminLoginForm").style.display = "none";
-        loadAppointments();
-      }
       if(loggedIn){
         loginScreen.style.display = 'none';
         mainSite.style.display = 'block';
@@ -830,22 +882,6 @@
     loginForm.addEventListener('submit', e => {
       e.preventDefault();
       const username = document.getElementById('loginIdentifier').value.trim();
-      const password = document.getElementById('loginPassword').value;
-
-      if(username === ADMIN_USER && password === ADMIN_PASS){
-        isAdminLoggedIn = true;
-        localStorage.setItem('adminLogged', 'true');
-        localStorage.removeItem('loggedIn');
-        localStorage.removeItem('username');
-        loginScreen.style.display = "none";
-        mainSite.style.display = "block";
-        document.getElementById("adminPanel").style.display = "block";
-        document.getElementById("adminLoginForm").style.display = "none";
-        welcomeText.textContent = `Welcome Admin`;
-        loadAppointments();
-        return;
-      }
-
       localStorage.setItem('loggedIn', 'true');
       localStorage.setItem('username', username);
       showMain(username);
@@ -862,14 +898,6 @@
         showVoiceButton();
       }
     });
-
-    document.getElementById("adminLogoutBtn").onclick = () => {
-      localStorage.removeItem("adminLogged");
-      isAdminLoggedIn = false;
-      document.getElementById("adminPanel").style.display = "none";
-      document.getElementById("adminLoginForm").style.display = "block";
-      document.getElementById("adminLoginStatus").textContent = "Logged out.";
-    };
   })();
 
   /* PRODUCT POPULATION */
@@ -972,91 +1000,6 @@
     });
   })();
 
-  /* Admin Panel */
-  (function(){
-    const adminLoginForm = document.getElementById('adminLoginForm');
-    const adminLoginStatus = document.getElementById('adminLoginStatus');
-    const appointmentsList = document.getElementById('appointmentsList');
-
-    function formatDateTime(dateStr, timeStr) {
-      const d = new Date(dateStr + 'T' + timeStr);
-      return d.toLocaleString();
-    }
-    window.loadAppointments = () => {
-      appointmentsList.innerHTML = '';
-      const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
-      if(appointments.length === 0){
-        appointmentsList.textContent = "No appointments booked.";
-        return;
-      }
-      appointments.forEach(app => {
-        const el = document.createElement('div');
-        el.style = "border-bottom:1px solid var(--neon); padding:0.5rem 0;";
-        el.innerHTML = `
-          <strong>${app.name}</strong> - ${app.email} <br />
-          Date & Time: ${formatDateTime(app.date, app.time)} <br />
-          Doctor: ${app.doctor} <br />
-          Notes: ${app.notes || "None"} <br />
-          <button class="btn btn-small" aria-label="Remove appointment" style="margin-top:5px;">Remove</button>
-        `;
-        el.querySelector("button").onclick = () => {
-          const appsNew = JSON.parse(localStorage.getItem('appointments') || '[]').filter(a => a.id !== app.id);
-          localStorage.setItem('appointments', JSON.stringify(appsNew));
-          loadAppointments();
-        };
-        appointmentsList.appendChild(el);
-      });
-    };
-    adminLoginForm?.addEventListener('submit', e => {
-      e.preventDefault();
-      const user = adminLoginForm.adminUser.value.trim();
-      const pass = adminLoginForm.adminPass.value;
-      if(user === "nds0822" && pass === "679984029904"){
-        adminLoginStatus.textContent = "Admin login successful.";
-        localStorage.setItem("adminLogged", "true");
-        adminLoginForm.style.display = "none";
-        document.getElementById("adminPanel").style.display = "block";
-        loadAppointments();
-      } else {
-        adminLoginStatus.textContent = "Invalid admin credentials.";
-      }
-    });
-  })();
-
-  /* AI Health Assessment */
-  (function(){
-    const form = document.querySelector('#ai-form form');
-    const input = document.getElementById('symptomsInput');
-    const result = document.getElementById('ai-result');
-
-    const conditions = {
-      headache: 'Possible causes: stress, dehydration, migraines. Consider resting in a dark room and hydrating.',
-      stomachache: 'Possible causes: indigestion, food poisoning, stomach virus. Avoid heavy meals and drink fluids.',
-      fever: 'A fever could indicate infection. Monitor temperature and seek medical advice if over 39°C or persistent.',
-      cough: 'May be due to cold, flu, or allergies. Keep hydrated and rest. Seek help if shortness of breath occurs.',
-      chestpain: 'Chest pain can be serious. Call emergency services immediately if severe.',
-      nausea: 'Commonly caused by indigestion or virus. Rest and avoid strong smells. Consult a doctor if persistent.',
-      dizziness: 'May be dehydration or low blood pressure. Sit down, drink fluids, and seek help if severe.',
-      fatigue: 'Could be caused by lack of sleep, stress, or illness. Ensure rest and balanced diet.'
-    };
-
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      const val = input.value.toLowerCase();
-      let found = false;
-      for(let key in conditions){
-        if(val.includes(key)){
-          result.textContent = conditions[key];
-          found = true;
-          break;
-        }
-      }
-      if(!found){
-        result.textContent = "Sorry, no clear assessment found. Please consult a healthcare professional.";
-      }
-    });
-  })();
-
   /* LIVE CHAT LOGIC */
   (function(){
     const chatToggleBtn = document.getElementById('chatToggle');
@@ -1069,6 +1012,7 @@
     let chatMode = 'bot';
     let emergencySimulating = false;
     let emergencyInterval = null;
+    let doctorJoined = false;
 
     // Hide big live chat button as toggle circle used now
     liveChatBtn.style.display = 'none';
@@ -1128,11 +1072,12 @@
       const username = localStorage.getItem('username') || 'User';
       if(emergencySimulating) return;
 
+      // If user says emergency anywhere, open chat in agent mode with emergency sequence
       if(userMsg.toLowerCase().includes('emergency')){
-        addChatMessage("CARE: It looks like this is an emergency. Are you safe right now?", "agent");
-        addChatOptions(["Yes, I'm safe", "No, it's urgent"]);
+        openChatAndStartEmergency();
         return;
       }
+
       if(userMsg.toLowerCase().includes('urgent') || userMsg.toLowerCase().includes('help')){
         addChatMessage("CARE: Are you currently with a medical agent or in an emergency?", "agent");
         addChatOptions(["Yes, agent", "No, emergency"]);
@@ -1162,13 +1107,14 @@
       buttons.forEach(b=>b.remove());
     }
     function processChatOption(option){
-      if(option === "No, it's urgent"){
-        startEmergencySimulation();
+      if(option === "No, emergency"){
+        openChatAndStartEmergency();
         return;
       }
       if(option === "Yes, agent"){
         chatMode = 'agent';
         addChatMessage("CARE: Connecting you to a medical agent... Please wait.", 'agent');
+        doctorJoined = true;
         return;
       }
       if(option === "Yes, I'm safe"){
@@ -1178,9 +1124,14 @@
       addChatMessage("CARE: How else can I help you?", "agent");
     }
 
-    async function startEmergencySimulation(){
-      emergencySimulating = true;
+    async function openChatAndStartEmergency(){
+      if(chatWidget.classList.contains('hidden')){
+        chatWidget.classList.remove('hidden');
+      }
       chatMessages.innerHTML = '';
+      chatMode = 'agent';
+      emergencySimulating = true;
+      doctorJoined = false;
       addChatMessage("Emergency detected. Please remain calm.", 'agent');
       const loadingText = document.createElement('p');
       loadingText.textContent = 'Waiting for doctor to join';
@@ -1197,10 +1148,10 @@
       clearInterval(emergencyInterval);
       loadingText.remove();
       addChatMessage("Doctor has joined the chat.", "agent");
-      chatMode = 'agent';
+      doctorJoined = true;
       chatInput.placeholder = "Type your emergency details here...";
       setTimeout(()=>{
-        addChatMessage("Doctor: Hello, I am your medical assistant. Please describe your symptoms or emergency in detail.");
+        addChatMessage("Doctor: Hello, I am your medical assistant. We are sending our emergency team on your coordinates. Please describe your symptoms or emergency in detail.", "agent");
       }, 1500);
       emergencySimulating = false;
     }
@@ -1218,17 +1169,22 @@
       }
     }
     async function simulateAgentResponse(userMsg){
+      if(!doctorJoined) {
+        addChatMessage("CARE: Please wait for a doctor to join.", "agent");
+        return;
+      }
       addChatMessage("Doctor: Let me check that for you...", "agent");
       await delay(1500);
       let answer = "Please be sure to call emergency services if your condition worsens.";
-      if(userMsg.toLowerCase().includes('pain')) answer = "Can you describe the pain's location and intensity?";
-      else if(userMsg.toLowerCase().includes('breathing')) answer = "Are you experiencing shortness of breath or chest pain?";
-      else if(userMsg.toLowerCase().includes('help')) answer = "I am here to help. Please provide more details.";
+      if(userMsg.toLowerCase().includes('pain')) answer = "Doctor: Can you describe the pain's location and intensity?";
+      else if(userMsg.toLowerCase().includes('breathing')) answer = "Doctor: Are you experiencing shortness of breath or chest pain?";
+      else if(userMsg.toLowerCase().includes('help')) answer = "Doctor: I am here to help. Please provide more details.";
+      else if(userMsg.toLowerCase().includes('thank')) answer = "Doctor: You're welcome. Stay safe!";
       addChatMessage(answer, "agent");
     }
   })();
 
-  /* VOICE CONTROL INTEGRATION with click-to-listen button */
+  /* VOICE CONTROL INTEGRATION with always listening for keyword and commands updated for silence on unknown */
   (function(){
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)){
       console.warn("Speech Recognition not supported");
@@ -1237,35 +1193,39 @@
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
-    recognition.continuous = false;
+    recognition.continuous = true; // Always listen continuously
     recognition.lang = 'en-US';
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
     const voiceBtn = document.getElementById('voiceControlBtn');
+    const chatToggleBtn = document.getElementById('chatToggle');
+    const chatWidget = document.getElementById('chatWidget');
 
-    // Commands dictionary
+    // Commands dictionary for exact phrases/keywords mapped to functions or selectors
     const voiceCommands = {
-      'dashboard': '#dashboard',
-      'products': '#products',
-      'doctors': '#doctor',
-      'media': '#mediaSection',
-      'education': '#education',
-      'health documents': '#healthdocs',
-      'appointment': '#appointment',
-      'about': '#about',
-      'live chat': '#chatToggle',
-      'scroll down': 'scrollDown',
-      'scroll up': 'scrollUp',
-      'go to top': 'goToTop',
-      'go to bottom': 'goToBottom',
-      'stop reading': 'stopReading',
-      'start reading': 'startReading',
-      'read page': 'startReading',
-      'refresh page': 'refreshPage'
+      'dashboard': () => scrollAndRespond('#dashboard'),
+      'products': () => scrollAndRespond('#products'),
+      'doctors': () => scrollAndRespond('#doctor'),
+      'media': () => scrollAndRespond('#mediaSection'),
+      'education': () => scrollAndRespond('#education'),
+      'health documents': () => scrollAndRespond('#healthdocs'),
+      'appointment': () => scrollAndRespond('#appointment'),
+      'about': () => scrollAndRespond('#about'),
+      'live chat': () => { chatToggleBtn.click(); },
+      'scroll down': () => { window.scrollBy({top: 300, behavior: 'smooth'}); },
+      'scroll up': () => { window.scrollBy({top: -300, behavior: 'smooth'}); },
+      'go to top': () => { window.scrollTo({top: 0, behavior: 'smooth'}); },
+      'go to bottom': () => { window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'}); },
+      'refresh page': () => { setTimeout(() => location.reload(), 500); },
+      'stop reading': () => stopReading(),
+      'start reading': () => startReadingPage(),
+      'read page': () => startReadingPage(),
+      'qr code': () => openQrCode(),
+      'close': () => closeQrCodeOrChat(),
+      'emergency': () => openEmergencyChatViaVoice(),
     };
 
-    // Reading state
     let isReading = false;
     let readUtterance = null;
 
@@ -1275,90 +1235,32 @@
 
     recognition.onend = () => {
       voiceBtn.classList.remove('listening');
-      // Automatically stop the mic on end, user must click again to restart
+      // Automatically restart recognition to keep always listening
+      setTimeout(() => recognition.start(), 500);
     };
 
     recognition.onerror = e => {
       voiceBtn.classList.remove('listening');
-      console.warn('Speech recognition error', e.error);
       if(e.error === 'not-allowed' || e.error === 'permission-denied'){
         alert('Permission to use microphone denied. Please allow microphone access and try again.');
       }
     };
 
     recognition.onresult = event => {
-      const transcript = event.results[0][0].transcript.toLowerCase().trim();
-      console.log('Voice input:', transcript);
-      let commandFound = false;
+      const transcript = event.results[event.results.length-1][0].transcript.toLowerCase().trim();
+      // No voice response on any command or unknown
       for(let key in voiceCommands){
         if(transcript.includes(key)){
-          commandFound = true;
-          const action = voiceCommands[key];
-
-          if(action === '#chatToggle'){
-            let element = document.querySelector(action);
-            if(element){
-              element.click();
-              addVoiceResponse(`Opening live chat.`);
-            } else {
-              addVoiceResponse("Live chat button not found.");
-            }
-            break;
-          } else if(action === 'scrollDown'){
-            window.scrollBy({top: 300, behavior: 'smooth'});
-            addVoiceResponse("Scrolling down.");
-            break;
-          } else if(action === 'scrollUp'){
-            window.scrollBy({top: -300, behavior: 'smooth'});
-            addVoiceResponse("Scrolling up.");
-            break;
-          } else if(action === 'goToTop'){
-            window.scrollTo({top: 0, behavior: 'smooth'});
-            addVoiceResponse("Going to top of the page.");
-            break;
-          } else if(action === 'goToBottom'){
-            window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
-            addVoiceResponse("Going to bottom of the page.");
-            break;
-          } else if(action === 'refreshPage'){
-            addVoiceResponse("Refreshing the page.");
-            setTimeout(() => location.reload(), 500);
-            break;
-          } else if(action === 'stopReading'){
-            if(isReading && readUtterance){
-              window.speechSynthesis.cancel();
-              addVoiceResponse("Stopped reading.");
-              isReading = false;
-              readUtterance = null;
-            } else {
-              addVoiceResponse("Not currently reading.");
-            }
-            break;
-          } else if(action === 'startReading'){
-            if(isReading){
-              addVoiceResponse("Already reading the page.");
-              break;
-            }
-            startReadingPage();
-            break;
-          } else {
-            let element = document.querySelector(action);
-            if(element){
-              element.scrollIntoView({behavior:'smooth', block:'center'});
-              addVoiceResponse(`Navigating to ${key}.`);
-            } else {
-              addVoiceResponse(`I found the command ${key} but couldn't find the section.`);
-            }
-            break;
-          }
+          voiceCommands[key]();
+          return;
         }
       }
-      if(!commandFound){
-        addVoiceResponse("Command not recognized. Please try again.");
-      }
+      // Unknown command - remain quiet without response
     };
 
-    // Start recognition on button click
+    // Start recognition immediately to always listen
+    recognition.start();
+
     voiceBtn.onclick = () => {
       try {
         recognition.start();
@@ -1367,28 +1269,28 @@
       }
     };
 
-    // Show voice button only after user logged in or signed up
+    // Shows voice button only after user is logged in/signs up (called from login/signup)
     function showVoiceButton(){
       voiceBtn.style.display = 'flex';
     }
 
-    // Add speech feedback using speech synthesis
-    function addVoiceResponse(text){
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      window.speechSynthesis.speak(utterance);
+    function scrollAndRespond(selector){
+      let element = document.querySelector(selector);
+      if(element){
+        element.scrollIntoView({behavior:'smooth', block:'center'});
+      }
     }
 
-    // Read page content fully from top to bottom, no skips
     function startReadingPage(){
+      if(isReading){
+        return;
+      }
       const mainContent = document.getElementById('mainSite');
       if(!mainContent){
-        addVoiceResponse("Main content not found.");
         return;
       }
       const textToRead = getVisibleText(mainContent).trim();
       if(!textToRead){
-        addVoiceResponse("Nothing to read on this page.");
         return;
       }
       isReading = true;
@@ -1398,10 +1300,15 @@
       readUtterance.onend = () => {
         isReading = false;
         readUtterance = null;
-        addVoiceResponse("Finished reading the page.");
       };
       window.speechSynthesis.speak(readUtterance);
-      addVoiceResponse("Starting reading the page.");
+    }
+    function stopReading(){
+      if(isReading && readUtterance){
+        window.speechSynthesis.cancel();
+        isReading = false;
+        readUtterance = null;
+      }
     }
     function getVisibleText(element) {
       let text = '';
@@ -1418,15 +1325,214 @@
       return text.replace(/\s+/g, ' ');
     }
 
-    // Listen for login/signed in event: observe localStorage for 'loggedIn'
-    const checkLoginInterval = setInterval(() => {
-      if(localStorage.getItem('loggedIn') === 'true'){
-        showVoiceButton();
-        clearInterval(checkLoginInterval);
+    // QR code open and close logic
+    const qrModal = document.getElementById('qrModal');
+    const qrCloseBtn = document.getElementById('qrCloseBtn');
+    qrCloseBtn.onclick = () => closeQrCodeOrChat();
+    function openQrCode(){
+      if(qrModal.style.display === 'flex'){
+        return;
       }
-    }, 1000);
+      qrModal.style.display = 'flex';
+    }
+    function closeQrCodeOrChat(){
+      if(qrModal.style.display === 'flex'){
+        qrModal.style.display = 'none';
+      } else if(!chatWidget.classList.contains('hidden')){
+        chatWidget.classList.add('hidden');
+      }
+    }
+
+    // Emergency chat opening via voice with automatic doctor join
+    function openEmergencyChatViaVoice(){
+      if(chatWidget.classList.contains('hidden')){
+        chatWidget.classList.remove('hidden');
+      }
+      let chatMessages = document.getElementById('chatMessages');
+      chatMessages.innerHTML = '';
+      addChatMessage("Emergency detected. Please remain calm.", 'agent');
+      addChatMessage("Doctor has joined the chat.", "agent");
+      addChatMessage("Doctor: Hello, I am your medical assistant. We are sending our emergency team on your coordinates. Please describe your symptoms or emergency in detail.", "agent");
+      chatInput.placeholder = "Type your emergency details here...";
+      chatInput.focus();
+      chatMode = "agent";
+    }
 
   })();
+
+  /* TICTACTOE: Super hard AI, no embedded code show after win */
+  (function(){
+    const boardDiv = document.getElementById('board');
+    const scoreboardDiv = document.getElementById('scoreboard');
+    const resetBtn = document.getElementById('ticTacResetBtn');
+    const ticToeSection = document.getElementById('ticTacToe');
+
+    let board = ['','','','','','','','',''];
+    let player = 'X'; // player = X, AI = O
+    let scores = {player:0, ai:0, draws:0};
+    let gameActive = true;
+
+    resetBtn.onclick = resetGame;
+
+    function createBoard(){
+      boardDiv.innerHTML = '';
+      boardDiv.setAttribute('aria-live', 'polite');
+      board.forEach((cell, idx) => {
+        const cellDiv = document.createElement('div');
+        cellDiv.setAttribute('role', 'button');
+        cellDiv.setAttribute('tabindex', 0);
+        cellDiv.setAttribute('aria-label', `Cell ${idx+1},${cell ? ' ' + cell : ' empty'}`);
+        cellDiv.textContent = cell;
+        if(gameActive){
+          cellDiv.onclick = () => playerMove(idx);
+          cellDiv.onkeydown = (e) => { if(e.key === 'Enter' || e.key === ' ') playerMove(idx);}
+          cellDiv.style.cursor = 'pointer';
+        } else {
+          // disable clicks when game not active
+          cellDiv.onclick = null;
+          cellDiv.onkeydown = null;
+          cellDiv.style.cursor = 'default';
+        }
+        boardDiv.appendChild(cellDiv);
+      });
+    }
+
+    function playerMove(idx){
+      if(!gameActive) return;
+      if(board[idx] !== '') return;
+      board[idx] = player;
+      createBoard();
+      if(checkWin(board, player)){
+        scores.player++;
+        updateScoreboard();
+        gameActive = false;
+        // Hide board on win, no code visible after winning, just restart silently after short delay
+        setTimeout(() => {
+          ticToeSection.style.display = 'none';
+          resetGame(true);
+        }, 600);
+        return;
+      }
+      if(checkDraw(board)){
+        scores.draws++;
+        updateScoreboard();
+        gameActive = false;
+        setTimeout(() => {
+          resetGame(true);
+        }, 600);
+        return;
+      }
+      gameActive = false; // prevent fast clicks before AI moves
+      setTimeout(() => {
+        aiMove();
+        gameActive = true;
+      }, 300);
+    }
+
+    // Minimax algorithm for unbeatable AI
+    function aiMove(){
+      let bestScore = -Infinity;
+      let move = -1;
+      for(let i = 0; i < 9; i++){
+        if(board[i] === ''){
+          board[i] = 'O';
+          let score = minimax(board, 0, false);
+          board[i] = '';
+          if(score > bestScore){
+            bestScore = score;
+            move = i;
+          }
+        }
+      }
+      if(move >= 0){
+        board[move] = 'O';
+        createBoard();
+        if(checkWin(board, 'O')){
+          scores.ai++;
+          updateScoreboard();
+          gameActive = false;
+          setTimeout(() => {
+            ticToeSection.style.display = 'none';
+            resetGame(true);
+          }, 600);
+          return;
+        }
+        if(checkDraw(board)){
+          scores.draws++;
+          updateScoreboard();
+          gameActive = false;
+          setTimeout(() => {
+            resetGame(true);
+          }, 600);
+          return;
+        }
+      }
+    }
+
+    function minimax(newBoard, depth, isMaximizing){
+      if(checkWin(newBoard, 'O')) return 10 - depth;
+      if(checkWin(newBoard, 'X')) return depth - 10;
+      if(checkDraw(newBoard)) return 0;
+
+      if(isMaximizing){
+        let bestScore = -Infinity;
+        for(let i=0; i < 9; i++){
+          if(newBoard[i] === ''){
+            newBoard[i] = 'O';
+            let score = minimax(newBoard, depth+1, false);
+            newBoard[i] = '';
+            bestScore = Math.max(score, bestScore);
+          }
+        }
+        return bestScore;
+      } else {
+        let bestScore = Infinity;
+        for(let i=0; i < 9; i++){
+          if(newBoard[i] === ''){
+            newBoard[i] = 'X';
+            let score = minimax(newBoard, depth+1, true);
+            newBoard[i] = '';
+            bestScore = Math.min(score, bestScore);
+          }
+        }
+        return bestScore;
+      }
+    }
+
+    function checkWin(b, player){
+      const wins = [
+        [0,1,2], [3,4,5], [6,7,8],
+        [0,3,6], [1,4,7], [2,5,8],
+        [0,4,8], [2,4,6]
+      ];
+      return wins.some(line => line.every(i => b[i] === player));
+    }
+
+    function checkDraw(b){
+      return b.every(cell => cell !== '');
+    }
+
+    function resetGame(hide = false){
+      board = ['','','','','','','','',''];
+      gameActive = true;
+      createBoard();
+      updateScoreboard();
+      if(hide){
+        setTimeout(() => {
+          ticToeSection.style.display = 'block';
+        }, 500);
+      }
+    }
+
+    function updateScoreboard(){
+      scoreboardDiv.textContent = `Score - You: ${scores.player} | AI: ${scores.ai} | Draws: ${scores.draws}`;
+    }
+
+    createBoard();
+    updateScoreboard();
+    ticTacToe.style.display = 'block'; // Show on page load
+  })();
+
 </script>
 </body>
 </html>
